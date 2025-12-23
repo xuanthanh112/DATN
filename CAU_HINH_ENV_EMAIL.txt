@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════
+   CẤU HÌNH EMAIL GMAIL TRONG FILE .ENV
+═══════════════════════════════════════════════════════════
+
+Mở file .env và thêm/sửa các dòng sau:
+
+───────────────────────────────────────────────────────────
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password_16_chars
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your_email@gmail.com
+MAIL_FROM_NAME="VPHome"
+───────────────────────────────────────────────────────────
+
+📌 LƯU Ý:
+- MAIL_USERNAME: Email Gmail của bạn
+- MAIL_PASSWORD: App Password 16 ký tự (KHÔNG phải mật khẩu Gmail)
+- MAIL_FROM_ADDRESS: Có thể dùng email khác
+- MAIL_FROM_NAME: Tên hiển thị khi gửi email
+
+🔑 CÁCH LẤY APP PASSWORD:
+1. Vào: https://myaccount.google.com/apppasswords
+2. Chọn "Mail" và "Other (Custom name)"
+3. Nhập tên: Laravel VPHome
+4. Click "Generate"
+5. Copy mật khẩu 16 ký tự (viết liền, bỏ khoảng trắng)
+
+⚠️ QUAN TRỌNG:
+- Phải bật 2-Step Verification trước
+- App Password chỉ hiển thị 1 lần, hãy copy ngay!
+- KHÔNG dùng mật khẩu Gmail thông thường
+
+═══════════════════════════════════════════════════════════
+

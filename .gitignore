@@ -1,0 +1,26 @@
+/vendor
+/node_modules
+
+# Environment & config
+.env
+.env.*.backup
+
+# Compiled & cache
+/bootstrap/cache/*.php
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Logs
+/storage/logs/*
+
+# IDE & system files
+/.idea
+/.vscode
+*.log
+
+# Existing archive
+omegadeco.com.zip
+
+# Ignore problematic long-path image folder (Windows path length limit)
+/public/userfiles/image/product/may-hut-chan-khong-p290b-da-nang-cao-cap/*
