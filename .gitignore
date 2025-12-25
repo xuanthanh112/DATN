@@ -24,3 +24,9 @@ omegadeco.com.zip
 
 # Ignore problematic long-path image folder (Windows path length limit)
 /public/userfiles/image/product/may-hut-chan-khong-p290b-da-nang-cao-cap/*
+
+# Test and temporary files
+test_*.php
+test_*.md
+check_*.php
+*.backup
