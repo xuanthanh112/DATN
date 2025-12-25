@@ -720,6 +720,87 @@ ul li{
     position: relative;
 }
 
+/* Widget sections - extend just enough to align with first and last products */
+/* Apply to all widgets with products/posts below */
+.panel-flash-sale .main-heading,
+.panel-featured-products .main-heading,
+.panel-product .main-heading {
+    padding-left: 0 !important;
+}
+
+.panel-flash-sale .main-heading:before,
+.panel-featured-products .main-heading:before,
+.panel-product .main-heading:before {
+    display: none !important;
+}
+
+/* Ensure container can contain extended panel-head */
+.panel-flash-sale .uk-container,
+.panel-featured-products .uk-container,
+.panel-product .uk-container,
+.panel-news .uk-container {
+    position: relative;
+    overflow: visible;
+}
+
+/* Extend panel-head to align with first product on left and last product on right */
+.panel-flash-sale .panel-head,
+.panel-featured-products .panel-head,
+.panel-product .panel-head,
+.panel-news .panel-head {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure panel-body doesn't extend beyond container and has proper spacing */
+.panel-flash-sale .panel-body,
+.panel-featured-products .panel-body,
+.panel-product .panel-body,
+.panel-news .panel-body {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    z-index: 0;
+}
+
+/* Add proper spacing between widgets to prevent overlap */
+.panel-flash-sale {
+    margin-bottom: 0;
+    padding-bottom: 40px;
+}
+
+.panel-featured-products {
+    margin-bottom: 0;
+    padding-bottom: 40px;
+}
+
+.panel-product {
+    margin-bottom: 50px;
+}
+
+.panel-news {
+    margin-bottom: 0;
+    padding-bottom: 40px;
+}
+
+@media (max-width: 1024px) {
+    .panel-flash-sale .panel-head,
+    .panel-featured-products .panel-head,
+    .panel-product .panel-head,
+    .panel-news .panel-head {
+        margin-left: -10px;
+        margin-right: -10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
 .main-heading:before{
     filter: brightness(96%);
     content:'';
@@ -758,6 +839,7 @@ ul li{
     -ms-transition: all .5s ease-out;
     -o-transition: all .5s ease-out;
     padding-top:10px;
+    height: auto;
 }
 .product-item .image{
     height:144px;

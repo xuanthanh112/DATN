@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Services\Interfaces\PromotionServiceInterface  as PromotionService;
 use App\Repositories\Interfaces\PromotionRepositoryInterface as PromotionRepository;
 use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
-use App\Repositories\Interfaces\SourceRepositoryInterface as SourceRepository;
 
 use App\Http\Requests\Promotion\StorePromotionRequest;
 use App\Http\Requests\Promotion\UpdatePromotionRequest;
@@ -21,19 +20,16 @@ class PromotionController extends Controller
     protected $promotionService;
     protected $promotionRepository;
     protected $languageRepository;
-    protected $sourceRepository;
     protected $language;
 
     public function __construct(
         PromotionService $promotionService,
         PromotionRepository $promotionRepository,
         LanguageRepository $languageRepository,
-        SourceRepository $sourceRepository,
     ){
         $this->promotionService = $promotionService;
         $this->promotionRepository = $promotionRepository;
         $this->languageRepository = $languageRepository;
-        $this->sourceRepository = $sourceRepository;
         $this->middleware(function($request, $next){
             $locale = app()->getLocale(); // vn en cn
             $language = Language::where('canonical', $locale)->first();
@@ -68,15 +64,13 @@ class PromotionController extends Controller
 
     public function create(){
         $this->authorize('modules', 'promotion.create');
-        $sources = $this->sourceRepository->all();
         $config = $this->config();
         $config['seo'] = __('messages.promotion');
         $config['method'] = 'create';
         $template = 'backend.promotion.promotion.store';
         return view('backend.dashboard.layout', compact(
             'template',
-            'config',
-            'sources'
+            'config'
         ));
     }
 
@@ -92,7 +86,6 @@ class PromotionController extends Controller
     public function edit($id){
         $this->authorize('modules', 'promotion.update');
         $promotion = $this->promotionRepository->findById($id);
-        $sources = $this->sourceRepository->all();
         // dd($promotion->discountInformation);
         $config = $this->config();
         $config['seo'] = __('messages.promotion');
@@ -102,7 +95,6 @@ class PromotionController extends Controller
             'template',
             'config',
             'promotion',
-            'sources',
         ));
     }
 

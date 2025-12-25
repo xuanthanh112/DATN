@@ -17,21 +17,60 @@
                     <div class="panel-body">
                         
                         {{-- Filter --}}
-                        <form action="{{ route('customer.warranty.list') }}" method="GET" class="mb20">
-                            <div class="uk-grid uk-grid-small">
-                                <div class="uk-width-medium-1-2">
-                                    <input type="text" name="keyword" value="{{ request('keyword') }}" placeholder="Tìm kiếm sản phẩm..." class="input-text">
+                        <form action="{{ route('customer.warranty.list') }}" method="GET" class="warranty-filter-form mb20">
+                            <div class="filter-container" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%); border: 1px solid #ffcccc; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(218, 34, 41, 0.1);">
+                                <div class="uk-grid uk-grid-small uk-flex-middle">
+                                    <div class="uk-width-medium-1-2">
+                                        <div class="search-input-wrapper" style="position: relative;">
+                                            <i class="fa fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; z-index: 1;"></i>
+                                            <input 
+                                                type="text" 
+                                                name="keyword" 
+                                                value="{{ request('keyword') }}" 
+                                                placeholder="Tìm kiếm sản phẩm..." 
+                                                class="warranty-search-input"
+                                                style="width: 100%; padding: 12px 15px 12px 45px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: all 0.3s ease; outline: none; background: #fff;"
+                                                onfocus="this.style.borderColor='#da2229'; this.style.boxShadow='0 0 0 3px rgba(218, 34, 41, 0.1)';"
+                                                onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none';"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="uk-width-medium-1-4">
+                                        <div class="select-wrapper" style="position: relative;">
+                                            <i class="fa fa-filter" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; z-index: 1; pointer-events: none;"></i>
+                                            <select 
+                                                name="status" 
+                                                class="warranty-status-select"
+                                                style="width: 100%; padding: 12px 15px 12px 45px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: all 0.3s ease; outline: none; background: #fff; appearance: none; cursor: pointer;"
+                                                onfocus="this.style.borderColor='#da2229'; this.style.boxShadow='0 0 0 3px rgba(218, 34, 41, 0.1)';"
+                                                onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none';"
+                                            >
+                                                <option value="">Tất cả trạng thái</option>
+                                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>🟢 Đang bảo hành</option>
+                                                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>🔴 Hết hạn</option>
+                                            </select>
+                                            <i class="fa fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none; z-index: 1;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="uk-width-medium-1-4">
+                                        <button 
+                                            type="submit" 
+                                            class="warranty-filter-btn"
+                                            style="width: 100%; padding: 12px 20px; background: linear-gradient(135deg, #da2229 0%, #ff6b6b 100%); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(218, 34, 41, 0.3);"
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(218, 34, 41, 0.4)';"
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(218, 34, 41, 0.3)';"
+                                        >
+                                            <i class="fa fa-search" style="margin-right: 8px;"></i>Lọc
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="uk-width-medium-1-4">
-                                    <select name="status" class="input-text">
-                                        <option value="">Tất cả</option>
-                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Đang BH</option>
-                                        <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Hết hạn</option>
-                                    </select>
+                                @if(request('keyword') || request('status'))
+                                <div class="filter-reset mt15" style="margin-top: 15px;">
+                                    <a href="{{ route('customer.warranty.list') }}" style="color: #da2229; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center;">
+                                        <i class="fa fa-times-circle" style="margin-right: 5px;"></i> Xóa bộ lọc
+                                    </a>
                                 </div>
-                                <div class="uk-width-medium-1-4">
-                                    <button type="submit" class="btn btn-primary">Lọc</button>
-                                </div>
+                                @endif
                             </div>
                         </form>
 

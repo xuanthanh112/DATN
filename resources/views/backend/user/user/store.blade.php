@@ -9,7 +9,7 @@
     </div>
 @endif
 @php
-    $url = ($config['method'] == 'create') ? route('user.store') : route('user.update', $user->id);
+    $url = ($config['method'] == 'create') ? route('user.store') : route('user.update', isset($user) ? $user->id : '');
 @endphp
 <form action="{{ $url }}" method="post" class="box">
     @csrf
@@ -34,7 +34,7 @@
                                     <input 
                                         type="text"
                                         name="email"
-                                        value="{{ old('email', ($user->email) ?? '' ) }}"
+                                        value="{{ old('email', (isset($user) ? $user->email : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"
@@ -47,7 +47,7 @@
                                     <input 
                                         type="text"
                                         name="name"
-                                        value="{{ old('name', ($user->name) ?? '' ) }}"
+                                        value="{{ old('name', (isset($user) ? $user->name : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"
@@ -55,25 +55,19 @@
                                 </div>
                             </div>
                         </div>
-                        @php
-                            $userCatalogue = [
-                                '[Chọn nhóm thành viên]',
-                                'Quản trị viên',
-                                'Cộng tác viên'
-                            ];       
-                                   
-
-                        @endphp
                         <div class="row mb15">
                             <div class="col-lg-6">
                                 <div class="form-row">
                                     <label for="" class="control-label text-left">Nhóm Thành viên <span class="text-danger">(*)</span></label>
                                     <select name="user_catalogue_id" class="form-control setupSelect2">
-                                        @foreach($userCatalogue as $key => $item)
-                                        <option {{ 
-                                            $key == old('user_catalogue_id', (isset($user->user_catalogue_id)) ? $user->user_catalogue_id : '') ? 'selected' : '' 
-                                            }}  value="{{ $key }}">{{ $item }}</option>
-                                        @endforeach
+                                        <option value="0">[Chọn nhóm thành viên]</option>
+                                        @if(isset($userCatalogues) && $userCatalogues->count() > 0)
+                                            @foreach($userCatalogues as $userCatalogue)
+                                            <option {{ 
+                                                $userCatalogue->id == old('user_catalogue_id', (isset($user->user_catalogue_id)) ? $user->user_catalogue_id : '') ? 'selected' : '' 
+                                                }}  value="{{ $userCatalogue->id }}">{{ $userCatalogue->name }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -128,7 +122,7 @@
                                     <input 
                                         type="text"
                                         name="image"
-                                        value="{{ old('image', ($user->image) ?? '') }}"
+                                        value="{{ old('image', (isset($user) ? $user->image : '')) }}"
                                         class="form-control upload-image"
                                         placeholder=""
                                         autocomplete="off"
@@ -190,7 +184,7 @@
                                     <input 
                                         type="text"
                                         name="address"
-                                        value="{{ old('addresss', ($user->address) ?? '') }}"
+                                        value="{{ old('address', (isset($user) ? $user->address : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"
@@ -205,7 +199,7 @@
                                     <input 
                                         type="text"
                                         name="phone"
-                                        value="{{ old('phone', ($user->phone) ?? '') }}"
+                                        value="{{ old('phone', (isset($user) ? $user->phone : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"
@@ -218,7 +212,7 @@
                                     <input 
                                         type="text"
                                         name="description"
-                                        value="{{ old('description', ($user->description) ?? '') }}"
+                                        value="{{ old('description', (isset($user) ? $user->description : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"

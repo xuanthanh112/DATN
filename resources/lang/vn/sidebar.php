@@ -21,10 +21,6 @@ return [
                     'title' => 'Theo sản phẩm',
                     'route' => 'report/product'
                 ],
-                [
-                    'title' => 'Theo nguồn khách',
-                    'route' => 'report/customer'
-                ],
             ]
         ],
         // [
@@ -58,14 +54,6 @@ return [
                 [
                     'title' => 'QL Sản phẩm',
                     'route' => 'product/index'
-                ],
-                [
-                    'title' => 'QL Loại thuộc tính',
-                    'route' => 'attribute/catalogue/index'
-                ],
-                [
-                    'title' => 'QL thuộc tính',
-                    'route' => 'attribute/index'
                 ],
 
             ]
@@ -118,15 +106,11 @@ return [
         [
             'title' => 'QL Marketing',
             'icon' => 'fa fa-money',
-            'name' => ['promotion', 'source'],
+            'name' => ['promotion'],
             'subModule' => [
                 [
                     'title' => 'QL Khuyến mại',
                     'route' => 'promotion/index'
-                ],
-                [
-                    'title' => 'QL nguồn khách',
-                    'route' => 'source/index'
                 ],
             ]
         ],

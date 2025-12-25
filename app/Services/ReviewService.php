@@ -43,8 +43,25 @@ class ReviewService extends BaseService implements ReviewServiceInterface
         DB::beginTransaction();
         try{
             $payload = $request->except('_token');
-            // dd($payload);
-            $review = $this->reviewRepository->create($payload);
+            
+            // Kiểm tra xem đã có review chưa (dựa vào email và product)
+            $existingReview = $this->reviewRepository->findByEmailAndProduct(
+                $payload['email'],
+                $payload['reviewable_type'],
+                $payload['reviewable_id']
+            );
+            
+            if($existingReview){
+                // Nếu đã có, update thay vì create
+                $this->reviewRepository->update($existingReview->id, $payload);
+                $message = 'Cập nhật đánh giá thành công';
+            } else {
+                // Nếu chưa có, tạo mới
+                $review = $this->reviewRepository->create($payload);
+                $message = 'Đánh giá sản phẩm thành công';
+            }
+            
+            // Cập nhật nested set
             $this->reviewNestedset = new ReviewNested([
                 'table' => 'reviews',
                 'reviewable_type' => $payload['reviewable_type']
@@ -52,10 +69,11 @@ class ReviewService extends BaseService implements ReviewServiceInterface
             $this->reviewNestedset->Get('level ASC, order ASC');
             $this->reviewNestedset->Recursive(0, $this->reviewNestedset->Set());
             $this->reviewNestedset->Action();
+            
             DB::commit();
             return [
                 'code' => 10,
-                'message' => 'Đánh giá sản phẩm thành công'
+                'message' => $message
             ];
         }catch(\Exception $e ){
             DB::rollBack();

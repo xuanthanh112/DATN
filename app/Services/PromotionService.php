@@ -49,7 +49,8 @@ class PromotionService extends BaseService implements PromotionServiceInterface
             'neverEndDate',
             'neverEndDate',
         );
-        $payload['maxDiscountValue'] = convert_price($request->input(PromotionEnum::PRODUCT_AND_QUANTITY.'.maxDiscountValue'));
+        // maxDiscountValue: giới hạn giá trị chiết khấu tối đa (có thể để trống = 0 = không giới hạn)
+        $payload['maxDiscountValue'] = convert_price($request->input(PromotionEnum::PRODUCT_AND_QUANTITY.'.maxDiscountValue', 0));
         $payload['discountValue'] = convert_price($request->input(PromotionEnum::PRODUCT_AND_QUANTITY.'.discountValue'));
         $payload['discountType'] = $request->input(PromotionEnum::PRODUCT_AND_QUANTITY.'.discountType');
         if(is_null($payload['discountType'])){
@@ -142,19 +143,14 @@ class PromotionService extends BaseService implements PromotionServiceInterface
     private function handleSourceAndCondition($request){
         $data = [
             'source' => [
-                'status' => $request->input('source'),
-                'data' => $request->input('sourceValue'),
+                'status' => 'all', // Mặc định áp dụng cho tất cả
+                'data' => null,
             ],
             'apply' => [
-                'status' => $request->input('applyStatus'),
-                'data' => $request->input('applyValue'),
+                'status' => 'all', // Mặc định áp dụng cho tất cả đối tượng
+                'data' => null,
             ]
         ];
-        if(!is_null($data['apply']['data'])){
-            foreach($data['apply']['data'] as $key => $val){
-                $data['apply']['condition'][$val] = $request->input($val); 
-            }
-        }
         return $data;
     }
 

@@ -96,9 +96,49 @@ if(!function_exists('getPrice')){
         }
 
         if(isset($product->promotions) && isset($product->promotions->discountType)){
-            $result['percent'] = getPercent($product, $product->promotions->discount);
-            if($product->promotions->discountValue > 0){
-                $result['priceSale'] = getPromotionPrice($product->price, $product->promotions->discount);
+            // Kiểm tra nếu là khuyến mại theo sản phẩm và số lượng
+            $isProductQuantityPromotion = false;
+            // Kiểm tra nếu là khuyến mại theo sản phẩm và số lượng
+            if(isset($product->promotions->discountInformation)){
+                // discountInformation có thể là string (JSON) hoặc array
+                $discountInfo = is_string($product->promotions->discountInformation) 
+                    ? json_decode($product->promotions->discountInformation, true) 
+                    : $product->promotions->discountInformation;
+                
+                if(isset($discountInfo['info']) && isset($discountInfo['info']['quantity'])){
+                    $isProductQuantityPromotion = true;
+                    // Với khuyến mại theo số lượng, chỉ hiển thị giá khuyến mại khi số lượng >= số lượng tối thiểu
+                    // Trên trang chi tiết, giả định số lượng = 1 (số lượng tối thiểu thường là 1)
+                    $quantity = $discountInfo['info']['quantity'];
+                    $minQuantity = is_array($quantity) ? (int)($quantity[0] ?? 1) : (int)$quantity;
+                    
+                    // Nếu số lượng tối thiểu > 1, không hiển thị giá khuyến mại trên trang chi tiết
+                    // Vì người dùng chưa chọn số lượng
+                    if($minQuantity > 1){
+                        // Không áp dụng khuyến mại trên trang chi tiết
+                        return $result;
+                    }
+                }
+            }
+            
+            $discountValue = 0;
+            $discountType = $product->promotions->discountType ?? 'cash';
+            $maxDiscountValue = $product->promotions->maxDiscountValue ?? 0;
+            
+            if($discountType == 'cash'){
+                $discountValue = $product->promotions->discountValue ?? 0;
+            } else if($discountType == 'percent'){
+                $discountValue = ($product->promotions->discountValue ?? 0) / 100 * $product->price;
+            }
+            
+            // Áp dụng giới hạn chiết khấu tối đa
+            if($maxDiscountValue > 0 && $discountValue > $maxDiscountValue){
+                $discountValue = $maxDiscountValue;
+            }
+            
+            if($discountValue > 0){
+                $result['percent'] = getPercent($product, $discountValue);
+                $result['priceSale'] = getPromotionPrice($product->price, $discountValue);
             }
         }
         $result['html'] .= '<div class="price uk-flex uk-flex-middle mt10">';

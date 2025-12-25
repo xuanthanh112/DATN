@@ -141,37 +141,6 @@ return [
             'title' => 'Xóa nhóm sản phẩm'
         ],
     ],
-    'attributeCatalogue' => [
-        'index' => [
-            'title' => 'Quản lý loại thuộc tính',
-            'table' => 'Danh sách loại thuộc tính'
-        ],
-        'create' => [
-            'title' => 'Thêm mới loại thuộc tính'
-        ],
-        'edit' => [
-            'title' => 'Cập nhật loại thuộc tính'
-        ],
-        'delete' => [
-            'title' => 'Xóa loại thuộc tính'
-        ],
-    ],
-    'attribute' => [
-        'index' => [
-            'title' => 'Quản lý thuộc tính',
-            'table' => 'Danh sách thuộc tính'
-        ],
-        'create' => [
-            'title' => 'Thêm mới thuộc tính'
-        ],
-        'edit' => [
-            'title' => 'Cập nhật thuộc tính'
-        ],
-        'delete' => [
-            'title' => 'Xóa thuộc tính'
-        ],
-    
-    ],
     'product' => [
         'index' => [
             'title' => 'Quản lý sản phẩm',

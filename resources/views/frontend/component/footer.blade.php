@@ -55,9 +55,12 @@
                     <div class="uk-width-large-1-4">
                         <div class="footer-contact">
                             <div class="ft-heading">Thông tin liên hệ</div>
-                            <p>Địa chỉ: {{ $system['contact_address'] }}</p>
-                            <p>Số điện thoại: {{ $system['contact_hotline'] }}</p>
-                            <p>Email: {{ $system['contact_website'] }}</p>
+                            <p>Địa chỉ: {{ $system['contact_address'] ?? '' }}</p>
+                            <p>Số điện thoại: {{ $system['contact_hotline'] ?? '' }}</p>
+                            <p>Email: {{ $system['contact_email'] ?? '' }}</p>
+                            @if(!empty($system['contact_website']))
+                            <p>Website: {{ $system['contact_website'] }}</p>
+                            @endif
                         </div>
                     </div>
                 </div>

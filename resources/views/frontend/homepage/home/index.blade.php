@@ -82,7 +82,6 @@
                             <div class="panel-head">
                                 <div class="uk-flex uk-flex-middle uk-flex-space-between">
                                     <h2 class="heading-1"><a href="{{ $catCanonical }}" title="{{ $catName }}">{{ $catName }}</a></h2>
-                                    <a href="{{ $catCanonical }}" class="readmore">Tất cả sản phẩm</a>
                                 </div>
                             </div>
                         </div>

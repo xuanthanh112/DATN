@@ -22,11 +22,14 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
 
 
     public function findByProduct(array $productId = []){
-        return $this->model->select(
+        $query = $this->model->select(
             'promotions.id as promotion_id',
             'promotions.discountValue',
             'promotions.discountType',
             'promotions.maxDiscountValue',
+            'promotions.discountInformation',
+            'promotions.method',
+            'promotions.neverEndDate',
             'products.id as product_id',
             'products.price as product_price'
         )
@@ -55,10 +58,17 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
         ->join('products', 'products.id', '=', 'ppv.product_id')
         ->where('products.publish', 2)
         ->where('promotions.publish', 2)
+        ->where('promotions.method', 'product_and_quantity')
         ->whereIn('ppv.product_id', $productId)
-        ->whereDate('promotions.endDate', '>', now())
-        ->whereDate('promotions.startDate', '<', now())
-        ->groupBy('ppv.product_id')
+        ->whereDate('promotions.startDate', '<=', now());
+        
+        // Xử lý neverEndDate: nếu có thì không check endDate
+        $query->where(function($q) {
+            $q->where('promotions.neverEndDate', 'accept')
+              ->orWhereDate('promotions.endDate', '>=', now());
+        });
+        
+        return $query->groupBy('ppv.product_id', 'promotions.id')
         ->get();
     }
 
@@ -103,12 +113,18 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
 
     public function getPromotionByCartTotal()
     {
-        return $this->model
+        $query = $this->model
         ->where('promotions.publish', 2)
         ->where('promotions.method', 'order_amount_range')
-        ->whereDate('promotions.endDate', '>=', now())
-        ->whereDate('promotions.startDate', '<=', now())
-        ->get();
+        ->whereDate('promotions.startDate', '<=', now());
+        
+        // Xử lý neverEndDate: nếu có thì không check endDate
+        $query->where(function($q) {
+            $q->where('promotions.neverEndDate', 'accept')
+              ->orWhereDate('promotions.endDate', '>=', now());
+        });
+        
+        return $query->get();
     }
     
 

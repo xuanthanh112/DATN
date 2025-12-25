@@ -79,35 +79,6 @@ class ReportController extends Controller
         ));
     }
 
-    public function customer(Request $request){
-        $user = Auth::guard('web')->User();
-        $orderStatistic = $this->orderService->statistic(); 
-        $customerStatistic = $this->customerService->statistic();
-        $reports = [];
-        $totalSumaryRevenue = [];
-        if($request->input('startDate')){
-            $startDate = $request->input('startDate');
-            $endDate = $request->input('endDate');
-            $startDate = date("Y-m-d H:i:s", strtotime(str_replace('/', '-', $startDate)));
-            $endDate = date("Y-m-d H:i:s", strtotime(str_replace('/', '-', $endDate)));
-            $totalRevenue = $this->orderRepository->getTotalRevenueReportTime($startDate, $endDate);
-            $totalSumaryRevenue = convert_price($totalRevenue[0]['sum_revenue'] - $totalRevenue[0]['sum_discount'], true);
-            $reports = $this->orderRepository->getCustomerReportTime($startDate, $endDate);
-        }
-        $config = $this->config();
-        $template = 'backend.report.customer';
-        return view('backend.dashboard.layout', compact(
-            'template',
-            'config',
-            'orderStatistic',
-            'customerStatistic',
-            'user',
-            'reports',
-            'totalSumaryRevenue'
-        ));
-    }
-
-
     private function config(){
         return [
             'js' => [

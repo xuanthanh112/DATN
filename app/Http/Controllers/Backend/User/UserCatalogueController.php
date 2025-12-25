@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\Interfaces\UserCatalogueServiceInterface  as UserCatalogueService;
 use App\Repositories\Interfaces\UserCatalogueRepositoryInterface  as UserCatalogueRepository;
 use App\Repositories\Interfaces\PermissionRepositoryInterface  as PermissionRepository;
-use App\Http\Requests\StoreUserCatalogueRequest;
+use App\Http\Requests\User\StoreUserCatalogueRequest;
 
 class UserCatalogueController extends Controller
 {

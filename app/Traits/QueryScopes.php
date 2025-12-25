@@ -33,7 +33,9 @@ trait QueryScopes
     }
 
     public function scopePublish($query, $publish){
-        if(!empty($publish) ){
+        // Nếu publish = 0 hoặc null, hiển thị tất cả (không filter)
+        // Nếu publish = 1 hoặc 2, filter theo giá trị đó
+        if(!empty($publish) && $publish != 0){
             $query->where('publish', '=', $publish);
         }
         return $query;

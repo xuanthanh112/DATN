@@ -75,18 +75,6 @@ class Language extends Model
         )->withTimestamps();
     }
 
-    public function attribute_catalogues(){
-        return $this->belongsToMany(AttributeCatalogue::class, 'attribute_catalogue_language' , 'language_id', 'attribute_catalogue_id')
-        ->withPivot(
-            'name',
-            'canonical',
-            'meta_title',
-            'meta_keyword',
-            'meta_description',
-            'description',
-            'content'
-        )->withTimestamps();
-    }
 
     public function attributes(){
         return $this->belongsToMany(Product::class, 'attribute_language' , 'language_id', 'attribute_id')

@@ -9,7 +9,6 @@
         <th>Số điện thoại</th>
         <th>Địa chỉ</th>
         <th class="text-center">Nhóm khách hàng</th>
-        <th class="text-center">Nguồn</th>
         <th class="text-center">Tình Trạng</th>
         <th class="text-center">Thao tác</th>
     </tr>
@@ -35,9 +34,6 @@
                 </td>
                 <td class="text-center">
                     {{ $customer->customer_catalogues->name }}
-                </td>
-                <td class="text-center">
-                    {{ $customer->sources->name }}
                 </td>
                 <td class="text-center js-switch-{{ $customer->id }}"> 
                     <input type="checkbox" value="{{ $customer->publish }}" class="js-switch status " data-field="publish" data-model="{{ $config['model'] }}" {{ ($customer->publish == 2) ? 'checked' : '' }} data-modelId="{{ $customer->id }}" />

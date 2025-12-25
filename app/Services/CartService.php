@@ -71,6 +71,10 @@ class CartService  implements CartServiceInterface
                 $product = $this->productService->combineProductAndPromotion([$product->id], $product, true); 
                 $price = getPrice($product);
                 $data['price'] = ($price['priceSale'] > 0) ? $price['priceSale'] : $price['price'];
+                // Lưu giá gốc vào options để sau này tính lại khuyến mại
+                $data['options'] = [
+                    'priceOriginal' => $product->price
+                ];
             }
 
             Cart::instance('shopping')->add($data);
@@ -235,10 +239,88 @@ class CartService  implements CartServiceInterface
         $carts = Cart::instance('shopping')->content();
         $total = 0;
         $totalItems = 0;
+        
+        // Lấy danh sách product IDs từ giỏ hàng
+        $productIds = [];
         foreach($carts as $cart){
-            $total = $total + $cart->price * $cart->qty;
-            $totalItems = $totalItems + $cart->qty;
+            $explode = explode('_', $cart->id);
+            $productId = $explode[0];
+            if(!in_array($productId, $productIds)){
+                $productIds[] = $productId;
+            }
         }
+        
+        // Lấy khuyến mại theo sản phẩm
+        $productPromotions = [];
+        if(count($productIds) > 0){
+            $promotions = $this->promotionRepository->findByProduct($productIds);
+            foreach($promotions as $promotion){
+                $productPromotions[$promotion->product_id] = $promotion;
+            }
+        }
+        
+        // Tính toán lại giá với khuyến mại
+        foreach($carts as $cart){
+            $explode = explode('_', $cart->id);
+            $productId = $explode[0];
+            $cartQty = $cart->qty;
+            
+            // Lấy giá gốc từ cart (đã được set trong remakeCart hoặc từ options)
+            $originalPrice = isset($cart->priceOriginal) ? $cart->priceOriginal : 
+                            (isset($cart->options['priceOriginal']) ? $cart->options['priceOriginal'] : $cart->price);
+            $finalPrice = $originalPrice;
+            
+            // Kiểm tra và áp dụng khuyến mại theo sản phẩm
+            if(isset($productPromotions[$productId])){
+                $promotion = $productPromotions[$productId];
+                
+                // Kiểm tra điều kiện số lượng
+                if(isset($promotion->discountInformation) && 
+                   isset($promotion->discountInformation['info']) &&
+                   isset($promotion->discountInformation['info']['quantity'])){
+                    
+                    $minQuantity = (int)($promotion->discountInformation['info']['quantity'][0] ?? 0);
+                    $maxQuantity = isset($promotion->discountInformation['info']['maxQuantity'][0]) 
+                        ? (int)$promotion->discountInformation['info']['maxQuantity'][0] 
+                        : null;
+                    
+                    // Nếu maxQuantity là 0 hoặc null thì không giới hạn
+                    if($maxQuantity === 0){
+                        $maxQuantity = null;
+                    }
+                    
+                    // Kiểm tra số lượng trong giỏ hàng có đủ điều kiện không
+                    if($cartQty >= $minQuantity && ($maxQuantity === null || $cartQty <= $maxQuantity)){
+                        $discountValue = $promotion->discountValue ?? 0;
+                        $discountType = $promotion->discountType ?? 'cash';
+                        $maxDiscountValue = $promotion->maxDiscountValue ?? 0;
+                        
+                        if($discountValue > 0){
+                            if($discountType == 'cash'){
+                                $discount = $discountValue;
+                            } else if($discountType == 'percent'){
+                                $discount = ($discountValue / 100) * $originalPrice;
+                            }
+                            
+                            // Áp dụng giới hạn chiết khấu tối đa
+                            if($maxDiscountValue > 0 && $discount > $maxDiscountValue){
+                                $discount = $maxDiscountValue;
+                            }
+                            
+                            $finalPrice = $originalPrice - $discount;
+                            if($finalPrice < 0) $finalPrice = 0;
+                        }
+                    }
+                }
+            }
+            
+            // Cập nhật giá trong cart
+            $cart->price = $finalPrice;
+            
+            $total = $total + $finalPrice * $cartQty;
+            $totalItems = $totalItems + $cartQty;
+        }
+        
         return [
             'cartTotal' => $total,
             'cartTotalItems' => $totalItems
@@ -300,32 +382,77 @@ class CartService  implements CartServiceInterface
         $maxDiscount = 0;
         $selectedPromotion = null;
         $promotions = $this->promotionRepository->getPromotionByCartTotal();
-        if(!is_null($promotions)){
+        if(!is_null($promotions) && count($promotions) > 0){
             foreach($promotions as $promotion){
+                // Kiểm tra discountInformation có tồn tại và có key 'info' không
+                if(!isset($promotion->discountInformation) || !isset($promotion->discountInformation['info'])){
+                    continue;
+                }
+                
                 $discount = $promotion->discountInformation['info'];
                 $amountFrom = $discount['amountFrom'] ?? [];
                 $amountTo = $discount['amountTo'] ?? [];
                 $amountValue = $discount['amountValue'] ?? [];
                 $amountType = $discount['amountType'] ?? [];
 
-
-                if(!empty($amountFrom) && count($amountFrom) == count($amountTo) && count($amountTo) == count($amountValue)){
+                // Kiểm tra tất cả mảng phải có cùng số lượng phần tử
+                if(!empty($amountFrom) && 
+                   count($amountFrom) == count($amountTo) && 
+                   count($amountTo) == count($amountValue) &&
+                   count($amountValue) == count($amountType)){
+                    
+                    $bestDiscount = 0;
+                    $bestPromotion = null;
+                    $bestRangeIndex = -1;
+                    
+                    // Tìm khoảng khuyến mại phù hợp nhất
                     for($i = 0; $i < count($amountFrom); $i++){
                         $currentAmountFrom = convert_price($amountFrom[$i]);
                         $currentAmountTo = convert_price($amountTo[$i]);
                         $currentAmountValue = convert_price($amountValue[$i]);
                         $currentAmountType = $amountType[$i];
-                        if($cartTotal > $currentAmountFrom && ($cartTotal <= $currentAmountTo ) || $cartTotal > $currentAmountTo){
-
-                            if($currentAmountType == 'cash'){
-                                $maxDiscount = max($maxDiscount, $currentAmountValue);
-                            }else if($currentAmountType == 'percent'){
-                                $discountValue = ($currentAmountValue/100)*$cartTotal;
-                                $maxDiscount = max($maxDiscount, $discountValue);
+                        
+                        $currentDiscount = 0;
+                        $isInRange = false;
+                        
+                        // Kiểm tra điều kiện: cartTotal phải >= amountFrom
+                        if($cartTotal >= $currentAmountFrom){
+                            // Nếu cartTotal <= amountTo: nằm trong khoảng
+                            if($cartTotal <= $currentAmountTo){
+                                $isInRange = true;
                             }
-                            $selectedPromotion = $promotion;
+                            // Nếu cartTotal > amountTo: vượt quá khoảng, nhưng vẫn tính giá trị giảm giá
+                            // (sẽ chọn khoảng có giá trị giảm giá cao nhất)
+                            
+                            if($currentAmountType == 'cash'){
+                                $currentDiscount = $currentAmountValue;
+                            }else if($currentAmountType == 'percent'){
+                                $currentDiscount = ($currentAmountValue/100)*$cartTotal;
+                            }
+                            
+                            // Ưu tiên: nếu nằm trong khoảng thì ưu tiên hơn
+                            // Nếu cả hai đều trong khoảng hoặc cả hai đều ngoài khoảng, chọn giá trị giảm giá cao nhất
+                            if($isInRange){
+                                // Nếu đã có khoảng trong range tốt hơn, chỉ cập nhật nếu giá trị giảm giá cao hơn
+                                if($bestRangeIndex == -1 || $currentDiscount > $bestDiscount){
+                                    $bestDiscount = $currentDiscount;
+                                    $bestPromotion = $promotion;
+                                    $bestRangeIndex = $i;
+                                }
+                            } else {
+                                // Nếu chưa có khoảng nào trong range, mới xét khoảng ngoài range
+                                if($bestRangeIndex == -1 && $currentDiscount > $bestDiscount){
+                                    $bestDiscount = $currentDiscount;
+                                    $bestPromotion = $promotion;
+                                }
+                            }
                         }
-
+                    }
+                    
+                    // Áp dụng khuyến mại tốt nhất tìm được
+                    if($bestDiscount > 0){
+                        $maxDiscount = max($maxDiscount, $bestDiscount);
+                        $selectedPromotion = $bestPromotion;
                     }
                 }
             }

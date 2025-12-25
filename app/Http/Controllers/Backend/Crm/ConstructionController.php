@@ -4,17 +4,14 @@ namespace App\Http\Controllers\Backend\Crm;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Interfaces\ConstructServiceInterface  as ConstructService;
-use App\Repositories\Interfaces\AgencyRepositoryInterface  as AgencyRepository;
 use App\Repositories\Interfaces\ConstructRepositoryInterface as ConstructRepository;
 use App\Repositories\Interfaces\CustomerRepositoryInterface as CustomerRepository;
 use App\Repositories\Interfaces\CustomerCatalogueRepositoryInterface as CustomerCatalogueRepository;
-use App\Repositories\Interfaces\SourceRepositoryInterface as SourceRepository;
 use App\Repositories\Interfaces\ProvinceRepositoryInterface  as ProvinceRepository;
 use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
 use App\Http\Requests\Construct\StoreConstructRequest;
 use App\Http\Requests\Construct\UpdateConstructRequest;
 use App\Models\Language;
-use App\Repositories\AgencyRepository as RepositoriesAgencyRepository;
 
 
 class ConstructionController extends Controller
@@ -23,9 +20,7 @@ class ConstructionController extends Controller
     protected $constructRepository;
     protected $customerRepository;
     protected $customerCatalogueRepository;
-    protected $sourceRepository;
     protected $provinceRepository;
-    protected $agencyRepository;
     protected $languageRepository;
     protected $language;
     protected $model = 'Construction';
@@ -37,17 +32,13 @@ class ConstructionController extends Controller
         ConstructRepository $constructRepository,
         CustomerRepository $customerRepository,
         CustomerCatalogueRepository $customerCatalogueRepository,
-        SourceRepository $sourceRepository,
-        ProvinceRepository $provinceRepository,
-        AgencyRepository $agencyRepository
+        ProvinceRepository $provinceRepository
     ){
         $this->constructService = $constructService;
         $this->constructRepository = $constructRepository;
         $this->customerRepository = $customerRepository;
         $this->customerCatalogueRepository = $customerCatalogueRepository;
-        $this->sourceRepository = $sourceRepository;
         $this->provinceRepository = $provinceRepository;
-        $this->agencyRepository = $agencyRepository;
     }
 
     public function index(Request $request){
@@ -75,7 +66,6 @@ class ConstructionController extends Controller
 
     public function create(Request $request){
        
-        $agencys = convertCombineArray($this->agencyRepository->all());
         $customers = convertCombineArray($this->customerRepository->all(), 'name');
 
         $provinces = $this->provinceRepository->all();
@@ -88,7 +78,6 @@ class ConstructionController extends Controller
             'template',
             'config',
             'provinces',
-            'agencys',
             'customers',
         ));
     }
@@ -102,7 +91,6 @@ class ConstructionController extends Controller
 
     public function edit($id, Request $request){
 
-        $agencys = convertCombineArray($this->agencyRepository->all());
         $customers = convertCombineArray($this->customerRepository->all(), 'name');
         $provinces = $this->provinceRepository->all();
 
@@ -123,7 +111,6 @@ class ConstructionController extends Controller
             'config',
             'construct',
             'customers',
-            'agencys',
             'provinces',
             'productConstruction',
             'queryUrl'

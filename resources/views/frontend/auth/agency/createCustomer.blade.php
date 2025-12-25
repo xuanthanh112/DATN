@@ -40,19 +40,6 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-12">
-                                                    <div class="form-row customerWrapper">
-                                                        <label for="" class="control-label text-left">Nguồn khách <span class="text-danger">(*)</span></label>
-                                                        <select name="source_id" class="input-text setupSelect2">
-                                                            <option value="0">[Chọn Nguồn khách]</option>
-                                                            @foreach($sources as $key => $val)
-                                                            <option {{ 
-                                                                $val->id == old('source_id', (isset($customer->source_id)) ? $customer->source_id : '') ? 'selected' : '' 
-                                                                }}  value="{{ $val->id }}">{{ $val->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>

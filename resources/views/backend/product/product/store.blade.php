@@ -17,7 +17,6 @@
                     </div>
                 </div>
                @include('backend.dashboard.component.album', ['model' => ($product) ?? null])
-               @include('backend.product.product.component.variant')
                @include('backend.dashboard.component.seo', ['model' => ($product) ?? null])
             </div>
             <div class="col-lg-3">

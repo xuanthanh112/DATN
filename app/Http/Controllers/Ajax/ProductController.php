@@ -8,7 +8,6 @@ use App\Services\Interfaces\ProductServiceInterface  as ProductService;
 use App\Repositories\Interfaces\ProductRepositoryInterface  as ProductRepository;
 use App\Repositories\Interfaces\ProductVariantRepositoryInterface  as ProductVariantRepository;
 use App\Repositories\Interfaces\PromotionRepositoryInterface  as PromotionRepository;
-use App\Repositories\Interfaces\AttributeRepositoryInterface  as AttributeRepository;
 use App\Models\Language;
 use Cart;
 
@@ -19,20 +18,17 @@ class ProductController extends Controller
     protected $productRepository;
     protected $productVariantRepository;
     protected $promotionRepository;
-    protected $attributeRepository;
     protected $language;
 
     public function __construct(
         ProductRepository $productRepository,
         ProductVariantRepository $productVariantRepository,
         PromotionRepository $promotionRepository,
-        AttributeRepository $attributeRepository,
         ProductService $productService,
     ){
         $this->productRepository = $productRepository;
         $this->productVariantRepository = $productVariantRepository;
         $this->promotionRepository = $promotionRepository;
-        $this->attributeRepository = $attributeRepository;
         $this->productService = $productService;
         $this->middleware(function($request, $next){
             $locale = app()->getLocale(); // vn en cn
@@ -86,21 +82,11 @@ class ProductController extends Controller
     }
    
     public function loadVariant(Request $request){
-        $get = $request->input();
-        $attributeId = $get['attribute_id'];
-        
-        $attributeId = sortAttributeId($attributeId);
-        
-        $variant = $this->productVariantRepository->findVariant($attributeId, $get['product_id'], $get['language_id']);
-
-        $variantPromotion = $this->promotionRepository->findPromotionByVariantUuid($variant->uuid);
-        $variantPrice = getVariantPrice($variant, $variantPromotion);
-
+        // Attribute Catalogue feature removed - variant loading disabled
         return response()->json([
-            'variant' => $variant ,
-            'variantPrice' => $variantPrice,
+            'variant' => null,
+            'variantPrice' => null,
         ]);
-        
     }
     
 
@@ -126,9 +112,6 @@ class ProductController extends Controller
                     $price = getPrice($product);
                     $catName = $product->product_catalogues->first()->languages->first()->pivot->name;
                     $review = getReview($product);
-                    if(isset($product->attribute_concat)){
-                        $attributes = substr($product->attribute_concat, 0, -1);
-                    }
                    
                     $html .= '<div class="uk-width-large-1-4 mb20">';
                         $html .= '<div class="product-item product">';

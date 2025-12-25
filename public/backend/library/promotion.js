@@ -323,12 +323,6 @@
                 case "product_and_quantity":
                     HT.renderProductAndQuantity()
                     break;
-                // case "product_quantity_range":
-                //     console.log("product_quantity_range");
-                //     break;
-                // case "goods_discount_by_quantity":
-                //     console.log("goods_discount_by_quantity");
-                //     break;
                 default:
                     HT.removePromotionContainer()
             }
@@ -431,6 +425,7 @@
 
         let preloadData = JSON.parse($('.input_product_and_quantity').val()) || {
             quantity: ['1'],
+            maxQuantity: ['0'],
             maxDiscountValue: ['0'],
             discountValue: ['0'],
             discountType: ['cash'],
@@ -480,10 +475,10 @@
                         <td class="order_amount_range_to td-range">
                             <input 
                                 type="text"
-                                name="product_and_quantity[maxDiscountValue]"
+                                name="product_and_quantity[maxQuantity]"
                                 class="form-control int"
-                                placeholder="0"
-                                value="${preloadData.maxDiscountValue}"
+                                placeholder="0 (không giới hạn)"
+                                value="${preloadData.maxQuantity || ['0']}"
                             >
                         </td>
                         <td class="discountType">

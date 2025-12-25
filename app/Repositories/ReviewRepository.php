@@ -47,5 +47,12 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
                 ->withQueryString()->withPath(env('APP_URL').$extend['path']);
     }
 
+    public function findByEmailAndProduct($email, $reviewableType, $reviewableId){
+        return $this->model
+            ->where('email', $email)
+            ->where('reviewable_type', $reviewableType)
+            ->where('reviewable_id', $reviewableId)
+            ->first();
+    }
 
 }

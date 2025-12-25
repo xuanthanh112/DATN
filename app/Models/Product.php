@@ -23,8 +23,6 @@ class Product extends Model
         'price',
         'made_in',
         'code',
-        'attributeCatalogue',
-        'attribute',
         'variant',
         'qrcode',
         'warranty',
@@ -32,7 +30,6 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'attribute' => 'json'
     ];
 
     protected $table = 'products';
@@ -80,7 +77,7 @@ class Product extends Model
     }
 
     public function reviews(){
-        return $this->morphMany(Review::class, 'reviewable');
+        return $this->morphMany(Review::class, 'reviewable')->orderBy('created_at', 'DESC');
     }
 
     public function constructions(){

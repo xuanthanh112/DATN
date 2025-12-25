@@ -3,12 +3,6 @@
     <div class="product-catalogue page-wrapper">
         @include('frontend.component.breadcrumb', ['model' => $productCatalogue, 'breadcrumb' => $breadcrumb])
         <div class="uk-container uk-container-center mt20">
-            @if(!empty($productCatalogue->image))
-            <div class="category-banner mb20" style="position:relative;height:360px;border-radius:6px;overflow:hidden;">
-                <div style="position:absolute;inset:0;background:url('{{ $productCatalogue->image }}') center/cover no-repeat;filter:blur(14px) brightness(0.95);"></div>
-                <img src="{{ $productCatalogue->image }}" alt="{{ $productCatalogue->languages->first()->pivot->name }}" style="position:relative;z-index:1;max-height:100%;max-width:92%;width:auto;height:auto;display:block;margin:0 auto;">
-            </div>
-            @endif
            
             <div class="panel-body">
                 <div class="uk-grid uk-grid-medium">
@@ -25,14 +19,7 @@
                                             $canonical = write_url($category->languages->first()->pivot->canonical);
                                             $icon = $category->icon ?? ''; // Lấy icon
                                         @endphp
-                                        <li>
-                                            <a href="{{ $canonical }}" title="{{ $name }}">
-                                                @if(!empty($icon))
-                                                <img src="{{ $icon }}" alt="{{ $name }}" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;">
-                                                @endif
-                                                {{ $name }}
-                                            </a>
-                                        </li>
+                                        <li><a href="{{ $canonical }}" title="{{ $name }}">{{ $name }}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -64,15 +51,10 @@
                     </div>
                     <div class="uk-width-large-3-4">
                         <div class="wrapper ">
-                            <div class="uk-flex uk-flex-middle uk-flex-space-between mb10">
+                            <div class="uk-flex uk-flex-middle uk-flex-space-between mb20">
                                 <h1 class="heading-2"><span>{{ $productCatalogue->languages->first()->pivot->name }}</span></h1>
                                 @include('frontend.product.catalogue.component.filter')
                             </div>
-                            @if(!empty($productCatalogue->languages->first()->pivot->description))
-                                <div class="catalogue-intro mb20" style="color:#555;line-height:1.6;">
-                                    {!! $productCatalogue->languages->first()->pivot->description !!}
-                                </div>
-                            @endif
                             @include('frontend.product.catalogue.component.filterContent')
                             @if(!is_null($products))
                                 <div class="product-list">
@@ -89,13 +71,9 @@
                                     @include('frontend.component.pagination', ['model' => $products])
                                 </div>
                             @endif
-                            @if(!empty($productCatalogue->languages->first()->pivot->content))
-                                <div class="product-catalogue-content mt20" id="catalogueContent" style="max-height:220px;overflow:hidden;position:relative;">
-                                    {!! $productCatalogue->languages->first()->pivot->content !!}
-                                    <div id="contentFade" style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 70%);"></div>
-                                </div>
-                                <div class="uk-text-center mt10">
-                                    <button id="toggleContent" class="uk-button" style="background:#eaeaea;border-radius:4px;padding:6px 14px;">Xem thêm</button>
+                            @if(!empty($productCatalogue->languages->first()->pivot->description))
+                                <div class="product-catalogue-description">
+                                    {!! $productCatalogue->languages->first()->pivot->description !!}
                                 </div>
                             @endif
                         </div>

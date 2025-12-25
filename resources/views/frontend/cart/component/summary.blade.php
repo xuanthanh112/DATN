@@ -1,5 +1,17 @@
 <div class="panel-foot mt30 pay">
     <div class="cart-summary mb20">
+        @if(isset($cartPromotion['selectedPromotion']) && $cartPromotion['selectedPromotion'] && $cartPromotion['discount'] > 0)
+        <div class="promotion-info-box">
+            <div class="promotion-icon">
+                <i class="fa fa-gift"></i>
+            </div>
+            <div class="promotion-content">
+                <div class="promotion-title">Đang áp dụng khuyến mại</div>
+                <div class="promotion-name">{{ $cartPromotion['selectedPromotion']->name }}</div>
+                <div class="promotion-discount">Giảm: <span class="discount-amount">-{{ convert_price($cartPromotion['discount'], true) }}đ</span></div>
+            </div>
+        </div>
+        @endif
         <div class="cart-summary-item">
             <div class="uk-flex uk-flex-middle uk-flex-space-between">
                 <span class="summay-title">Giảm giá</span>

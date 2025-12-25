@@ -9,7 +9,7 @@
     </div>
 @endif
 @php
-    $url = ($config['method'] == 'create') ? route('user.catalogue.store') : route('user.catalogue.update', $userCatalogue->id);
+    $url = ($config['method'] == 'create') ? route('user.catalogue.store') : route('user.catalogue.update', isset($userCatalogue) ? $userCatalogue->id : '');
 @endphp
 <form action="{{ $url }}" method="post" class="box">
     @csrf
@@ -34,7 +34,7 @@
                                     <input 
                                         type="text"
                                         name="name"
-                                        value="{{ old('name', ($userCatalogue->name) ?? '' ) }}"
+                                        value="{{ old('name', (isset($userCatalogue) ? $userCatalogue->name : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"
@@ -47,7 +47,7 @@
                                     <input 
                                         type="text"
                                         name="description"
-                                        value="{{ old('description', ($userCatalogue->description) ?? '' ) }}"
+                                        value="{{ old('description', (isset($userCatalogue) ? $userCatalogue->description : '')) }}"
                                         class="form-control"
                                         placeholder=""
                                         autocomplete="off"

@@ -41,7 +41,7 @@ class CustomerRepository extends BaseRepository implements CustomerRepositoryInt
                 $query->where('publish', '=', $condition['publish']);
             }
             return $query;
-        })->with(['customer_catalogues', 'sources']);
+        })->with(['customer_catalogues']);
         if(!empty($join)){
             $query->join(...$join);
         }

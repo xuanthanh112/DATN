@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Http\ViewComposers\AgencyComposer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -36,15 +35,12 @@ class AppServiceProvider extends ServiceProvider
         'App\Services\Interfaces\ProductServiceInterface' => 'App\Services\ProductService',
         'App\Services\Interfaces\ProductCatalogueServiceInterface' => 'App\Services\ProductCatalogueService',
         'App\Services\Interfaces\ProductServiceInterface' => 'App\Services\ProductService',
-        'App\Services\Interfaces\AttributeCatalogueServiceInterface' => 'App\Services\AttributeCatalogueService',
-        'App\Services\Interfaces\AttributeServiceInterface' => 'App\Services\AttributeService',
         'App\Services\Interfaces\SystemServiceInterface' => 'App\Services\SystemService',
         'App\Services\Interfaces\MenuCatalogueServiceInterface' => 'App\Services\MenuCatalogueService',
         'App\Services\Interfaces\MenuServiceInterface' => 'App\Services\MenuService',
         'App\Services\Interfaces\SlideServiceInterface' => 'App\Services\SlideService',
         'App\Services\Interfaces\WidgetServiceInterface' => 'App\Services\WidgetService',
         'App\Services\Interfaces\PromotionServiceInterface' => 'App\Services\PromotionService',
-        'App\Services\Interfaces\SourceServiceInterface' => 'App\Services\SourceService',
         'App\Services\Interfaces\CartServiceInterface' => 'App\Services\CartService',
         'App\Services\Interfaces\OrderServiceInterface' => 'App\Services\OrderService',
         'App\Services\Interfaces\ReviewServiceInterface' => 'App\Services\ReviewService',

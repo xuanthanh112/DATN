@@ -11,7 +11,6 @@ use App\Http\Controllers\Backend\User\UserCatalogueController;
 use App\Http\Controllers\Backend\User\PermissionController;
 use App\Http\Controllers\Backend\Customer\CustomerController;
 use App\Http\Controllers\Backend\Customer\CustomerCatalogueController;
-use App\Http\Controllers\Backend\Customer\SourceController;
 use App\Http\Controllers\Backend\DistributionController;
 use App\Http\Controllers\Backend\Post\PostCatalogueController;
 use App\Http\Controllers\Backend\Post\PostController;
@@ -26,11 +25,9 @@ use App\Http\Controllers\Backend\WarrantyController;
 use App\Http\Controllers\Backend\Promotion\PromotionController;
 use App\Http\Controllers\Backend\ReviewController;
 use App\Http\Controllers\Ajax\LocationController;
-use App\Http\Controllers\Ajax\AttributeController as AjaxAttributeController;
 use App\Http\Controllers\Ajax\MenuController as AjaxMenuController;
 use App\Http\Controllers\Ajax\SlideController as AjaxSlideController;
 use App\Http\Controllers\Ajax\ProductController as AjaxProductController;
-use App\Http\Controllers\Ajax\SourceController as AjaxSourceController;
 use App\Http\Controllers\Ajax\CartController as AjaxCartController;
 use App\Http\Controllers\Ajax\OrderController as AjaxOrderController;
 use App\Http\Controllers\Ajax\ReviewController as AjaxReviewController;
@@ -38,8 +35,6 @@ use App\Http\Controllers\Ajax\PostController as AjaxPostController;
 use App\Http\Controllers\Ajax\DistributionController as AjaxDistributionController;
 use App\Http\Controllers\Backend\Product\ProductCatalogueController;
 use App\Http\Controllers\Backend\Product\ProductController;
-use App\Http\Controllers\Backend\Attribute\AttributeCatalogueController;
-use App\Http\Controllers\Backend\Attribute\AttributeController;
 use App\Http\Controllers\Backend\SystemController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\RouterController;
@@ -321,17 +316,6 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
       Route::post('saveTranslate', [WidgetController::class, 'saveTranslate'])->name('widget.saveTranslate');
    });
 
-   Route::group(['prefix' => 'source'], function () {
-      Route::get('index', [SourceController::class, 'index'])->name('source.index');
-      Route::get('create', [SourceController::class, 'create'])->name('source.create');
-      Route::post('store', [SourceController::class, 'store'])->name('source.store');
-      Route::get('{id}/edit', [SourceController::class, 'edit'])->where(['id' => '[0-9]+'])->name('source.edit');
-      Route::post('{id}/update', [SourceController::class, 'update'])->where(['id' => '[0-9]+'])->name('source.update');
-      Route::get('{id}/delete', [SourceController::class, 'delete'])->where(['id' => '[0-9]+'])->name('source.delete');
-      Route::delete('{id}/destroy', [SourceController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('source.destroy');
-      
-   });
-
    Route::group(['prefix' => 'distribution'], function () {
       Route::get('index', [DistributionController::class, 'index'])->name('distribution.index');
       Route::get('create', [DistributionController::class, 'create'])->name('distribution.create');
@@ -372,25 +356,6 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
       Route::get('{id}/delete', [ProductController::class, 'delete'])->where(['id' => '[0-9]+'])->name('product.delete');
       Route::delete('{id}/destroy', [ProductController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('product.destroy');
    });
-   Route::group(['prefix' => 'attribute/catalogue'], function () {
-      Route::get('index', [AttributeCatalogueController::class, 'index'])->name('attribute.catalogue.index');
-      Route::get('create', [AttributeCatalogueController::class, 'create'])->name('attribute.catalogue.create');
-      Route::post('store', [AttributeCatalogueController::class, 'store'])->name('attribute.catalogue.store');
-      Route::get('{id}/edit', [AttributeCatalogueController::class, 'edit'])->where(['id' => '[0-9]+'])->name('attribute.catalogue.edit');
-      Route::post('{id}/update', [AttributeCatalogueController::class, 'update'])->where(['id' => '[0-9]+'])->name('attribute.catalogue.update');
-      Route::get('{id}/delete', [AttributeCatalogueController::class, 'delete'])->where(['id' => '[0-9]+'])->name('attribute.catalogue.delete');
-      Route::delete('{id}/destroy', [AttributeCatalogueController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('attribute.catalogue.destroy');
-   });
-   
-   Route::group(['prefix' => 'attribute'], function () {
-      Route::get('index', [AttributeController::class, 'index'])->name('attribute.index');
-      Route::get('create', [AttributeController::class, 'create'])->name('attribute.create');
-      Route::post('store', [AttributeController::class, 'store'])->name('attribute.store');
-      Route::get('{id}/edit', [AttributeController::class, 'edit'])->where(['id' => '[0-9]+'])->name('attribute.edit');
-      Route::post('{id}/update', [AttributeController::class, 'update'])->where(['id' => '[0-9]+'])->name('attribute.update');
-      Route::get('{id}/delete', [AttributeController::class, 'delete'])->where(['id' => '[0-9]+'])->name('attribute.delete');
-      Route::delete('{id}/destroy', [AttributeController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('attribute.destroy');
-   });
 
    Route::group(['prefix' => 'order'], function () {
       Route::get('index', [OrderController::class, 'index'])->name('order.index');
@@ -428,7 +393,6 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
    Route::group(['prefix' => 'report'], function () {
       Route::get('time', [ReportController::class, 'time'])->name('report.time');
       Route::get('product', [ReportController::class, 'product'])->name('report.product');
-      Route::get('customer', [ReportController::class, 'customer'])->name('report.customer');
    });
 
 //@@new-module@@
@@ -445,15 +409,12 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
    
    Route::get('ajax/dashboard/findPromotionObject', [AjaxDashboardController::class, 'findPromotionObject'])->name('ajax.dashboard.findPromotionObject');
    Route::get('ajax/dashboard/getPromotionConditionValue', [AjaxDashboardController::class, 'getPromotionConditionValue'])->name('ajax.dashboard.getPromotionConditionValue');
-   Route::get('ajax/attribute/getAttribute', [AjaxAttributeController::class, 'getAttribute'])->name('ajax.attribute.getAttribute');
-   Route::get('ajax/attribute/loadAttribute', [AjaxAttributeController::class, 'loadAttribute'])->name('ajax.attribute.getAttribute');
    Route::post('ajax/menu/createCatalogue', [AjaxMenuController::class, 'createCatalogue'])->name('ajax.menu.createCatalogue');
    Route::post('ajax/menu/drag', [AjaxMenuController::class, 'drag'])->name('ajax.menu.drag');
    Route::post('ajax/menu/deleteMenu', [AjaxMenuController::class, 'deleteMenu'])->name('ajax.menu.deleteMenu');
    Route::post('ajax/slide/order', [AjaxSlideController::class, 'order'])->name('ajax.slide.order');
    Route::get('ajax/product/loadProductPromotion', [AjaxProductController::class, 'loadProductPromotion'])->name('ajax.loadProductPromotion');
    
-   Route::get('ajax/source/getAllSource', [AjaxSourceController::class, 'getAllSource'])->name('ajax.getAllSource');
    Route::post('ajax/order/update', [AjaxOrderController::class, 'update'])->name('ajax.order.update');
    Route::get('ajax/order/chart', [AjaxOrderController::class, 'chart'])->name('ajax.order.chart');
 

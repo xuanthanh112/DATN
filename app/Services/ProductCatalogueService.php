@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Services\Interfaces\ProductCatalogueServiceInterface;
 use App\Services\BaseService;
 use App\Repositories\Interfaces\ProductCatalogueRepositoryInterface as ProductCatalogueRepository;
-use App\Repositories\Interfaces\AttributeCatalogueRepositoryInterface as AttributeCatalogueRepository;
-use App\Repositories\Interfaces\AttributeRepositoryInterface as AttributeRepository;
 use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,8 +23,6 @@ class ProductCatalogueService extends BaseService implements ProductCatalogueSer
 
 
     protected $productCatalogueRepository;
-    protected $attributeCatalogueRepository;
-    protected $attributeRepository;
     protected $routerRepository;
     protected $nestedset;
     protected $language;
@@ -35,13 +31,9 @@ class ProductCatalogueService extends BaseService implements ProductCatalogueSer
 
     public function __construct(
         ProductCatalogueRepository $productCatalogueRepository,
-        AttributeCatalogueRepository $attributeCatalogueRepository,
-        AttributeRepository $attributeRepository,
         RouterRepository $routerRepository,
     ){
         $this->productCatalogueRepository = $productCatalogueRepository;
-        $this->attributeCatalogueRepository = $attributeCatalogueRepository;
-        $this->attributeRepository = $attributeRepository;
         $this->routerRepository = $routerRepository;
     }
 
@@ -192,13 +184,8 @@ class ProductCatalogueService extends BaseService implements ProductCatalogueSer
                         $mergeArray[$key] = array_values(array_unique(array_merge($mergeArray[$key], $val)));
                     }
                 }
-                $flatAttributeArray = array_merge(...$mergeArray);
-                $attributeList = $this->attributeRepository->findAttributeProductVariant($flatAttributeArray, $productCatalogue->id);
-    
-                $payload['attribute'] = array_map(function($newArray) use ($attributeList){
-                        return  array_intersect($newArray, $attributeList->all());
-    
-                }, $mergeArray);
+                // Attribute Catalogue feature removed
+                $payload['attribute'] = $mergeArray;
     
             }
             $result = $this->productCatalogueRepository->update($productCatalogueId, $payload);
@@ -209,44 +196,9 @@ class ProductCatalogueService extends BaseService implements ProductCatalogueSer
   
 
     public function getFilterList(array $attribute = [], $languageId){
-        $attributeCatalougeId = array_keys($attribute);
-        $attributeId = array_unique(array_merge(...$attribute));
-
-
-        $attributeCatalogues = $this->attributeCatalogueRepository->findByCondition(
-            [
-                config('apps.general.defaultPublish')
-            ],
-            true, 
-            [
-                'languages' => function($query) use ($languageId){
-                    $query->where('language_id', $languageId);
-                }
-            ], 
-            ['id', 'asc'], 
-            [
-                'whereIn' => $attributeCatalougeId, 
-                'whereInField' => 'id'
-            ]
-        );
-
-        $attributes = $this->attributeRepository->findByCondition(
-            [
-                config('apps.general.defaultPublish')
-            ],
-            true, 
-            [
-                'languages' => function($query) use ($languageId){
-                    $query->where('language_id', $languageId);
-                    // $query->first();
-                }
-            ], 
-            ['id', 'asc'], 
-            [
-                'whereIn' => $attributeId, 
-                'whereInField' => 'id'
-            ]
-        );
+        // Attribute Catalogue feature removed - return empty array
+        $attributeCatalogues = collect([]);
+        $attributes = collect([]);
 
         foreach($attributeCatalogues as $key => $val){
             $attributeItem = [];

@@ -289,20 +289,19 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
 
     public function getProductReportTime($startDate, $endDate){
         return $this->model->select(
-                DB::raw("IFNULL(product_variants.sku, products.code) as sku"),
-                DB::raw("name as product_name"),
+                DB::raw("products.code as sku"),
+                DB::raw("order_product.name as product_name"),
                 DB::raw("COUNT(DISTINCT orders.customer_id) as count_customer"),
-                DB::raw("COUNT(orders.id) as count_order"),
+                DB::raw("SUM(order_product.qty) as count_order"),
                 DB::raw("SUM(order_product.price * order_product.qty) as sum_revenue"),
                 DB::raw("(SELECT SUM(JSON_UNQUOTE(JSON_EXTRACT(promotion, '$.discount'))) FROM orders WHERE DATE(created_at) = DATE(orders.created_at)) as sum_discount")
             )
             ->join('order_product', 'order_product.order_id', '=', 'orders.id')
-            ->leftJoin('product_variants', 'product_variants.uuid', '=', 'order_product.uuid')
             ->leftJoin('products', 'products.id', '=', 'order_product.product_id')
             ->whereDate('orders.created_at', '>=', $startDate)
             ->whereDate('orders.created_at', '<=', $endDate)
             ->where('orders.payment', '=', 'paid')
-            ->groupBy('order_product.product_id')
+            ->groupBy('order_product.product_id', 'products.code', 'order_product.name')
             ->get()->toArray();
     }
 

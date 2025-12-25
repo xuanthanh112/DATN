@@ -117,7 +117,6 @@ class CustomerService extends BaseService implements CustomerServiceInterface
             'name',
             'publish',
             'customer_catalogue_id',
-            'source_id',
         ];
     }
 

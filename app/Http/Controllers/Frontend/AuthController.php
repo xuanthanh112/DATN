@@ -4,25 +4,19 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\FrontendController;
 use App\Services\Interfaces\CustomerServiceInterface  as CustomerService;
-use App\Services\Interfaces\AgencyServiceInterface  as AgencyService;
 use App\Http\Requests\AuthRegisterRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail; 
 use App\Models\Customer;
-use App\Models\Agency;
 
 class AuthController extends FrontendController
 {
     protected $customerService;
-    protected $agencyService;
-    public function __construct(
-        CustomerService $customerService,
-        AgencyService $agencyService,
-    ){
+    public function __construct(CustomerService $customerService)
+    {
         $this->customerService = $customerService;
-        $this->agencyService = $agencyService;
         parent::__construct();
     }
 

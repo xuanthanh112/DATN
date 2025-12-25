@@ -9,8 +9,6 @@ use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
 use App\Repositories\Interfaces\ProductVariantLanguageRepositoryInterface as ProductVariantLanguageRepository;
 use App\Repositories\Interfaces\ProductVariantAttributeRepositoryInterface as ProductVariantAttributeRepository;
 use App\Repositories\Interfaces\PromotionRepositoryInterface as PromotionRepository;
-use App\Repositories\Interfaces\AttributeCatalogueRepositoryInterface as AttributeCatalogueRepository;
-use App\Repositories\Interfaces\AttributeRepositoryInterface as AttributeRepository;
 use App\Services\Interfaces\ProductCatalogueServiceInterface as ProductCatalogueService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,8 +32,6 @@ class ProductService extends BaseService implements ProductServiceInterface
     protected $productVariantLanguageRepository;
     protected $productVariantAttributeRepository;
     protected $promotionRepository;
-    protected $attributeCatalogueRepository;
-    protected $attributeRepository;
     protected $productCatalogueService;
     
     public function __construct(
@@ -44,8 +40,6 @@ class ProductService extends BaseService implements ProductServiceInterface
         ProductVariantLanguageRepository $productVariantLanguageRepository,
         ProductVariantAttributeRepository $productVariantAttributeRepository,
         PromotionRepository $promotionRepository,
-        AttributeCatalogueRepository $attributeCatalogueRepository,
-        AttributeRepository $attributeRepository,
         ProductCatalogueService $productCatalogueService,
     ){
         $this->productRepository = $productRepository;
@@ -53,8 +47,6 @@ class ProductService extends BaseService implements ProductServiceInterface
         $this->promotionRepository = $promotionRepository;
         $this->productVariantLanguageRepository = $productVariantLanguageRepository;
         $this->productVariantAttributeRepository = $productVariantAttributeRepository;
-        $this->attributeCatalogueRepository = $attributeCatalogueRepository;
-        $this->attributeRepository = $attributeRepository;
         $this->productCatalogueService = $productCatalogueService;
         $this->controllerName = 'ProductController';
     }
@@ -294,8 +286,6 @@ class ProductService extends BaseService implements ProductServiceInterface
         $payload['user_id'] = Auth::id();
         $payload['album'] = $this->formatAlbum($request);
         $payload['price'] = convert_price(($payload['price']) ?? 0);
-        $payload['attributeCatalogue'] = $this->formatJson($request, 'attributeCatalogue');
-        $payload['attribute'] = $request->input('attribute');
         $payload['variant'] = $this->formatJson($request, 'variant');
 
         $payload['qrcode'] = $this->qrCode($request);
@@ -308,9 +298,6 @@ class ProductService extends BaseService implements ProductServiceInterface
         $payload = $request->only($this->payload());
         $payload['album'] = $this->formatAlbum($request);
         $payload['price'] = convert_price($payload['price']);
-        if(!isset($payload['attribute'])){
-            $payload['attribute'] = null;
-        }
         $payload['qrcode'] = $this->qrCode($request);
         return $this->productRepository->update($id, $payload);
     }
@@ -365,8 +352,6 @@ class ProductService extends BaseService implements ProductServiceInterface
             'made_in',
             'code',
             'product_catalogue_id',
-            'attributeCatalogue',
-            'attribute',
             'variant',
             'iframe',
             'guarantee'
@@ -409,27 +394,7 @@ class ProductService extends BaseService implements ProductServiceInterface
 
     public function getAttribute($product, $language){
         $product->attributeCatalogue = [];
-        if(isset($product->attribute) && !is_null($product->attribute)){
-            $attributeCatalogueId = array_keys($product->attribute);
-            $attrCatalogues = $this->attributeCatalogueRepository->getAttributeCatalogueWhereIn($attributeCatalogueId, 'attribute_catalogues.id', $language);
-            /* ---- */
-            $attributeId = array_merge(...$product->attribute);
-            $attrs = $this->attributeRepository->findAttributeByIdArray($attributeId, $language);
-            if(!is_null($attrCatalogues)){
-                foreach($attrCatalogues as $key => $val){
-                    $tempAttributes = [];
-                    foreach($attrs as $attr){
-                        if($val->id == $attr->attribute_catalogue_id){
-                            $tempAttributes[] = $attr;
-                        }
-                    }
-                    $val->attributes = $tempAttributes;
-                }
-            }
-            $product->attributeCatalogue = $attrCatalogues;
-        }
         return $product;
-        
     }
 
     public function filter($request){
@@ -550,50 +515,12 @@ class ProductService extends BaseService implements ProductServiceInterface
     }
 
     private function attributeQuery($request){
-        $attributes = $request->input('attributes');
-        $query['select'] = null;
-        $query['join'] = null;
-        $query['where'] = null;
-
-        if(!is_null($attributes) && count($attributes)){
-
-
-            $concatExpression = 'CONCAT(';
-            $first = true;
-
-            $query['join'] = [
-                ['product_variants as pv', 'pv.product_id', '=' , 'products.id'],
-            ];
-            foreach($attributes as $key => $attribute){
-                $joinKey = 'tb'.$key;
-                $query['join'][] = [
-                    "product_variant_attribute as {$joinKey}", 
-                    "$joinKey.product_variant_id", 
-                    '=', 
-                    'pv.id'
-                ];
-                $query['where'][] = function($query) use($joinKey, $attribute){
-                    foreach($attribute as $attr){
-                        $query->orWhere("$joinKey.attribute_id", '=', $attr);
-                    }
-                };
-
-                if(!$first){
-                    $concatExpression .= ', ';
-                }else{
-                    $first = false;
-                }
-
-                $concatExpression .= "GROUP_CONCAT(DISTINCT $joinKey.attribute_id, ',')";
-            }
-
-            $concatExpression .= ' ) as attribute_concat';
-
-
-            $query['select'] = "pv.price as variant_price, pv.sku as variant_sku, pv.id as variant_id, $concatExpression";
-        }
-
-        return $query;
+        // Attribute Catalogue feature removed - return empty query
+        return [
+            'select' => null,
+            'join' => null,
+            'where' => null
+        ];
     }
 
 

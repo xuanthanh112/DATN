@@ -11,6 +11,7 @@ use App\Repositories\Interfaces\ProductRepositoryInterface as ProductRepository;
 use App\Repositories\Interfaces\ReviewRepositoryInterface as ReviewRepository;
 use App\Services\Interfaces\WidgetServiceInterface  as WidgetService;
 use App\Models\System;
+use Illuminate\Support\Facades\Auth;
 use Cart;
 
 class ProductController extends FrontendController
@@ -102,6 +103,17 @@ class ProductController extends FrontendController
 
 
 
+        // Kiểm tra customer đã đăng nhập chưa và đã đánh giá chưa
+        $customer = Auth::guard('customer')->user();
+        $existingReview = null;
+        if($customer){
+            $existingReview = $this->reviewRepository->findByEmailAndProduct(
+                $customer->email,
+                'App\Models\Product',
+                $product->id
+            );
+        }
+
         $config = $this->config();
         $system = $this->system;
         $seo = seo($product);
@@ -116,6 +128,8 @@ class ProductController extends FrontendController
             'widgets',
             'wishlist',
             'cartSeen',
+            'customer',
+            'existingReview',
         ));
     }
 
