@@ -20,7 +20,7 @@
                     <input type="checkbox" value="{{ $language->id }}" class="input-checkbox checkBoxItem">
                 </td>
                 <td>
-                    <span class="image img-cover"><img src="{{ image($language->image) }}" alt=""></span>
+                    <span class="language-flag"><img src="{{ image($language->image) }}" alt="{{ $language->name }}"></span>
                 </td>
                 <td>
                     {{ $language->name }}

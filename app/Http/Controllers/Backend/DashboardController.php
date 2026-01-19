@@ -32,6 +32,7 @@ class DashboardController extends Controller
         $startDate = convertDateTime( now(), 'Y-m-d 00:00:00');
         $endDate = convertDateTime( now(), 'Y-m-d 23:59:59');
         $newOrders = $this->orderRepository->newOrder($startDate, $endDate);
+        $topProducts = $this->orderRepository->getTopProducts(10);
         $config = $this->config();
         $template = 'backend.dashboard.home.index';
         return view('backend.dashboard.layout', compact(
@@ -39,7 +40,8 @@ class DashboardController extends Controller
             'config',
             'orderStatistic',
             'customerStatistic',
-            'newOrders'
+            'newOrders',
+            'topProducts'
         ));
     }
 

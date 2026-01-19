@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Customer\EditProfileRequest;
 use App\Http\Requests\Customer\RecoverCustomerPasswordRequest;
 use App\Services\Interfaces\CustomerServiceInterface  as CustomerService;
-use App\Services\Interfaces\ConstructServiceInterface  as ConstructService;
-use App\Repositories\Interfaces\ConstructRepositoryInterface  as ConstructRepository;
 use App\Services\Interfaces\ProductWarrantyServiceInterface as ProductWarrantyService;
 use App\Repositories\Interfaces\OrderRepositoryInterface as OrderRepository;
 
@@ -18,24 +16,18 @@ class CustomerController extends FrontendController
 {
   
     protected $customerService;
-    protected $constructRepository;
-    protected $constructService;
     protected $customer;
     protected $productWarrantyService;
     protected $orderRepository;
 
     public function __construct(
         CustomerService $customerService,
-        ConstructRepository $constructRepository,
-        ConstructService $constructService,
         ProductWarrantyService $productWarrantyService,
         OrderRepository $orderRepository
 
     ){
 
         $this->customerService = $customerService;
-        $this->constructService = $constructService;
-        $this->constructRepository = $constructRepository;
         $this->productWarrantyService = $productWarrantyService;
         $this->orderRepository = $orderRepository;
 
@@ -104,83 +96,6 @@ class CustomerController extends FrontendController
     public function logout(){
         Auth::guard('customer')->logout();
         return redirect()->route('home.index')->with('success', 'Bạn đã đăng xuất khỏi hệ thống.');
-    }
-
-    public function construction(Request $request){
-        $customer = Auth::guard('customer')->user();
-        $condition = [
-            'keyword' => $request->input('keyword'),
-            'confirm' => $request->input('confirm')
-        ];
-        $constructs = $this->constructRepository->findConstructByCustomer($customer->id, $condition);
-        $system = $this->system;
-        $seo = [
-            'meta_title' => 'Trang quản lý danh sách công trình của '.$customer['name'],
-            'meta_description' => '',
-            'meta_image' => '',
-            'canonical' => route('customer.profile')
-        ];
-    
-        return view('frontend.auth.customer.construction', compact(
-            'seo',
-            'system',
-            'customer',
-            'constructs',
-        ));
-    }
-    
-
-    public function constructionProduct($id){
-        $customer = Auth::guard('customer')->user();
-
-        $construction = $this->constructRepository->findById($id, ['*'], ['products']);
-
-        $system = $this->system;
-        $seo = [
-            'meta_title' => 'Chi tiết sản phẩm công trình '.$construction->name.' của '.$customer['name'],
-            'meta_description' => '',
-            'meta_image' => '',
-            'canonical' => route('customer.profile')
-        ];
-        return view('frontend.auth.customer.product', compact(
-            'seo',
-            'system',
-            'customer',
-            'construction',
-        ));
-    }
-
-    public function warranty(Request $request){
-        $customer = Auth::guard('customer')->user();
-
-        $condition = [
-            'keyword' => $request->input('keyword'),
-            'confirm' => $request->input('status')
-        ];
-
-        $warranty = $this->constructRepository->warranty($customer->id, $condition);
-
-
-        $system = $this->system;
-        $seo = [
-            'meta_title' => 'Thông tin kích hoạt bảo hành',
-            'meta_description' => '',
-            'meta_image' => '',
-            'canonical' => route('customer.profile')
-        ];
-        return view('frontend.auth.customer.warranty', compact(
-            'seo',
-            'system',
-            'customer',
-            'warranty',
-        ));
-    }
-
-    
-    public function active(Request $request){
-        $response = $this->constructService->activeWarranty($request, 'active');
-        return response()->json($response); 
-
     }
 
     // New Product Warranty Methods

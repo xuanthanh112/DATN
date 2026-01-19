@@ -23,7 +23,7 @@ class UpdateLanguageRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'canonical' => 'required|unique:languages,canonical, '.$this->id.'',
+            'canonical' => 'required|unique:languages,canonical,'.$this->id.',id,deleted_at,NULL',
         ];
     }
 

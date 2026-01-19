@@ -343,4 +343,26 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         ->get();
     }
 
+    public function getTopProducts($limit = 10){
+        return DB::table('order_product')
+            ->join('orders', 'orders.id', '=', 'order_product.order_id')
+            ->join('products', 'products.id', '=', 'order_product.product_id')
+            ->join('product_language', function($join) {
+                $join->on('product_language.product_id', '=', 'products.id')
+                     ->where('product_language.language_id', '=', 1);
+            })
+            ->select(
+                'products.id',
+                'products.image',
+                'product_language.name',
+                DB::raw('SUM(order_product.qty) as total_quantity'),
+                DB::raw('SUM(order_product.price * order_product.qty) as total_revenue')
+            )
+            ->where('orders.confirm', '!=', 'cancle')
+            ->groupBy('products.id', 'products.image', 'product_language.name')
+            ->orderBy('total_revenue', 'DESC')
+            ->limit($limit)
+            ->get();
+    }
+
 }

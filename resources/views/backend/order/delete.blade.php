@@ -13,7 +13,10 @@
                         <p><strong>Khách hàng:</strong> {{ $order->fullname }}</p>
                         <p><strong>Số điện thoại:</strong> {{ $order->phone }}</p>
                         <p><strong>Email:</strong> {{ $order->email }}</p>
-                        <p><strong>Tổng tiền:</strong> {{ convert_price($order->cart['cartTotal'], true) }}đ</p>
+                        @php
+                            $cart = is_string($order->cart) ? json_decode($order->cart, true) : $order->cart;
+                        @endphp
+                        <p><strong>Tổng tiền:</strong> {{ convert_price($cart['cartTotal'] ?? 0, true) }}đ</p>
                         <p><strong>Ngày tạo:</strong> {{ convertDateTime($order->created_at, 'd/m/Y H:i') }}</p>
                         <p class="text-danger mt20"><strong>Lưu ý:</strong> Không thể khôi phục đơn hàng sau khi xóa. Hãy chắc chắn bạn muốn thực hiện chức năng này.</p>
                     </div>

@@ -23,7 +23,7 @@ class StoreLanguageRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'canonical' => 'required|unique:languages',
+            'canonical' => 'required|unique:languages,canonical,NULL,id,deleted_at,NULL',
         ];
     }
 

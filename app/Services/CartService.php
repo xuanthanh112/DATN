@@ -451,8 +451,11 @@ class CartService  implements CartServiceInterface
                     
                     // Áp dụng khuyến mại tốt nhất tìm được
                     if($bestDiscount > 0){
-                        $maxDiscount = max($maxDiscount, $bestDiscount);
-                        $selectedPromotion = $bestPromotion;
+                        // Chỉ cập nhật selectedPromotion nếu bestDiscount lớn hơn maxDiscount hiện tại
+                        if($bestDiscount > $maxDiscount){
+                            $maxDiscount = $bestDiscount;
+                            $selectedPromotion = $bestPromotion;
+                        }
                     }
                 }
             }

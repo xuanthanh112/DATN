@@ -45,7 +45,6 @@ class AppServiceProvider extends ServiceProvider
         'App\Services\Interfaces\OrderServiceInterface' => 'App\Services\OrderService',
         'App\Services\Interfaces\ReviewServiceInterface' => 'App\Services\ReviewService',
         'App\Services\Interfaces\DistributionServiceInterface' => 'App\Services\DistributionService',
-        'App\Services\Interfaces\ConstructServiceInterface' => 'App\Services\ConstructService',
         'App\Services\Interfaces\ProductWarrantyServiceInterface' => 'App\Services\ProductWarrantyService',
     ];
 

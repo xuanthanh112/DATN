@@ -128,22 +128,22 @@ class OrderService extends BaseService implements OrderServiceInterface
 
     public function ajaxOrderChart($request){
         $type = $request->input('chartType');
+        $year = $request->input('year', now()->year); // Nhận year từ request hoặc dùng năm hiện tại
+        $month = $request->input('month', now()->month); // Nhận month từ request hoặc dùng tháng hiện tại
+        
         switch ($type) {
             case 1:
-                $year  = now()->year;
                 $response = convertRevenueChartData($this->orderRepository->revenueByYear($year));
                 break;
             case 7:
               $response = convertRevenueChartData($this->orderRepository->revenue7Day(), 'daily_revenue', 'date', 'Ngày');
               break;
             case 30:
-
-                $currentMonth = now()->month;
-                $currentYear  = now()->year;
-                $daysInMonth = Carbon::createFromDate($currentYear, $currentMonth, 1)->daysInMonth;
+                // Sử dụng month và year từ request
+                $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
 
                 $allDays = range(1, $daysInMonth);
-                $temp = $this->orderRepository->revenueCurrentMonth($currentMonth, $currentYear);
+                $temp = $this->orderRepository->revenueCurrentMonth($month, $year);
                 $label = [];
                 $data = [];
                 $temp2 = array_map(function($day) use ($temp, &$label, &$data){

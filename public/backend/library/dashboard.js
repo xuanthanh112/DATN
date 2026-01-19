@@ -69,16 +69,81 @@
             let chartType = button.attr('data-chart')
             $('.chartButton').removeClass('active')
             button.addClass('active')
+            
+            // Hiển thị/ẩn dropdown theo loại biểu đồ
+            if(chartType == '1'){
+                // Biểu đồ năm: chỉ hiện year
+                $('#monthSelect').hide()
+                $('#yearSelect').show()
+                HT.updateChartTitle()
+            } else if(chartType == '30'){
+                // Theo tháng: hiện cả year và month
+                $('#monthSelect').show()
+                $('#yearSelect').show()
+                HT.updateChartTitle()
+            } else {
+                // 7 ngày: ẩn cả hai
+                $('#monthSelect').hide()
+                $('#yearSelect').hide()
+                $('#chartTitle').text('7 ngày gần nhất')
+            }
+            
             HT.callChart(chartType)
         })
     }
 
+    HT.changeYear = () => {
+        $(document).on('change', '#yearSelect', function(e){
+            e.preventDefault()
+            HT.updateChartTitle()
+            
+            // Gọi lại biểu đồ
+            let activeButton = $('.chartButton.active')
+            let chartType = activeButton.attr('data-chart')
+            if(chartType == '1' || chartType == '30'){
+                HT.callChart(chartType)
+            }
+        })
+    }
+
+    HT.changeMonth = () => {
+        $(document).on('change', '#monthSelect', function(e){
+            e.preventDefault()
+            HT.updateChartTitle()
+            
+            // Gọi lại biểu đồ
+            let activeButton = $('.chartButton.active')
+            let chartType = activeButton.attr('data-chart')
+            if(chartType == '30'){
+                HT.callChart(chartType)
+            }
+        })
+    }
+
+    HT.updateChartTitle = () => {
+        let activeButton = $('.chartButton.active')
+        let chartType = activeButton.attr('data-chart')
+        let selectedYear = $('#yearSelect').val()
+        let selectedMonth = $('#monthSelect').val()
+        
+        if(chartType == '1'){
+            $('#chartTitle').text('Năm ' + selectedYear)
+        } else if(chartType == '30'){
+            $('#chartTitle').text('Tháng ' + selectedMonth + '/' + selectedYear)
+        }
+    }
+
     HT.callChart = (chartType) => {
+        let selectedYear = $('#yearSelect').val() || new Date().getFullYear()
+        let selectedMonth = $('#monthSelect').val() || new Date().getMonth() + 1
+        
         $.ajax({
             type        : 'GET',
             url         :  'ajax/order/chart',
             data		: {
-                chartType : chartType
+                chartType : chartType,
+                year: selectedYear,
+                month: selectedMonth
             },
             dataType    : 'json',
             success: function(response){
@@ -94,6 +159,10 @@
         HT.createChart(label, data)
 
         HT.changeChart();
+
+        HT.changeYear();
+
+        HT.changeMonth();
 
 
 	});

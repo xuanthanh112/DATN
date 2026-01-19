@@ -1325,3 +1325,134 @@ div.edit{
 .construction-product-box{
     margin-top:0 !important;
 }
+
+/* Language Flag Display in Table */
+table .language-flag {
+    width: 80px !important;
+    height: 50px !important;
+    display: block !important;
+}
+
+table .language-flag img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    border: 1px solid #e5e6e7;
+    border-radius: 4px;
+    padding: 2px;
+    background: #fff;
+}
+
+/* Fix cho image trong table */
+table td .language-flag {
+    width: 80px !important;
+    height: 50px !important;
+    display: inline-block !important;
+}
+
+table td .language-flag img {
+    display: block !important;
+}
+
+/* Language Switcher in Header */
+.navbar-top-links {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-top-links > li {
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar-top-links > li:has(.language-switcher) {
+    padding: 0 !important;
+    margin: 0;
+    display: inline-flex !important;
+    align-items: center;
+    vertical-align: middle;
+    height: auto;
+}
+
+.navbar-top-links > li:has(.language-switcher) > a {
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+.language-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0 15px;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.language-flag-item {
+    display: inline-block;
+    width: 66px;
+    height: 55px;
+    overflow: visible;
+    transition: opacity 0.3s ease;
+    position: relative;
+    opacity: 0.65;
+    margin: 0;
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 3px;
+    box-sizing: border-box;
+}
+
+.language-flag-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 3px;
+}
+
+.language-flag-item:hover {
+    opacity: 1;
+}
+
+.language-flag-item.active {
+    opacity: 1;
+}
+
+.language-flag-item.active::before {
+    content: '✓';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: linear-gradient(135deg, #1ab394, #18a689);
+    color: #fff;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(26, 179, 148, 0.4);
+    border: 2px solid #fff;
+    z-index: 10;
+}
+
+.language-flag-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+    background: #1ab394;
+    border-radius: 3px;
+}

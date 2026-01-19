@@ -37,14 +37,18 @@
                     <div><b>A:</b> {{ $order->address }}</div>
                 </td>
                 
+                @php
+                    $promotion = is_string($order->promotion) ? json_decode($order->promotion, true) : $order->promotion;
+                    $cart = is_string($order->cart) ? json_decode($order->cart, true) : $order->cart;
+                @endphp
                 <td class="text-right order-discount">
-                    {{ convert_price($order->promotion['discount'], true) }}
+                    {{ convert_price($promotion['discount'] ?? 0, true) }}
                 </td>
                 {{-- <td class="text-right order-shipping">
                     {{ convert_price($order->shipping, true) }}
                 </td> --}}
                 <td class="text-right order-total">
-                    {{ convert_price($order->cart['cartTotal'], true) }}
+                    {{ convert_price($cart['cartTotal'] ?? 0, true) }}
                 </td>
                 <td class="text-center">
                     {!! ($order->confirm != 'cancle') ? __('cart.confirm')[$order->confirm] : '<span class="cancle-badge">'.__('cart.confirm')[$order->confirm].'</span>' !!}

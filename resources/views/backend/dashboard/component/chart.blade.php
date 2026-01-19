@@ -2,11 +2,23 @@
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Biểu đồ doanh thu năm {{ date('Y') }}</h5>
+                <h5>Biểu đồ doanh thu <span id="chartTitle">Năm {{ date('Y') }}</span></h5>
                 <div class="pull-right">
+                    <div style="display: inline-block; margin-right: 10px;">
+                        <select class="form-control input-sm" id="yearSelect" style="display: inline-block; width: 100px; padding: 3px 10px; vertical-align: middle;">
+                            @for($year = 2024; $year <= date('Y'); $year++)
+                                <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>Năm {{ $year }}</option>
+                            @endfor
+                        </select>
+                        <select class="form-control input-sm" id="monthSelect" style="display: none; width: 100px; padding: 3px 10px; margin-left: 5px; vertical-align: middle;">
+                            @for($month = 1; $month <= 12; $month++)
+                                <option value="{{ $month }}" {{ $month == date('n') ? 'selected' : '' }}>Tháng {{ $month }}</option>
+                            @endfor
+                        </select>
+                    </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-xs btn-white chartButton active" data-chart="1">Biểu đồ năm</button>
-                        <button type="button" class="btn btn-xs btn-white chartButton" data-chart="30">Tháng hiện tại</button>
+                        <button type="button" class="btn btn-xs btn-white chartButton" data-chart="30">Theo tháng</button>
                         <button type="button" class="btn btn-xs btn-white chartButton" data-chart="7">7 ngày gần nhất</button>
                     </div>
                 </div>

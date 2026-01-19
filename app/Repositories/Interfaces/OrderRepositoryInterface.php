@@ -8,5 +8,5 @@ namespace App\Repositories\Interfaces;
  */
 interface OrderRepositoryInterface
 {
-    
+    public function getTopProducts($limit = 10);
 }

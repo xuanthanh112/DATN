@@ -58,8 +58,8 @@
                                                 <td>{{ $val->phone }}</td>
                                                 <td>{{ $val->address }}</td>
                                                 <td class="text-center"> 
-                                                    <a href="{{ route('agency.construction.edit', $val->id) }}" class="btn btn-success"><i class="fa fa-edit"></i></a>
-                                                    <a href="{{ route('agency.construction.delete') }}" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                                    {{-- <a href="{{ route('agency.construction.edit', $val->id) }}" class="btn btn-success"><i class="fa fa-edit"></i></a> --}}
+                                                    {{-- <a href="{{ route('agency.construction.delete') }}" class="btn btn-danger"><i class="fa fa-trash"></i></a> --}}
                                                 </td>
                                             </tr>
                                         @endforeach

@@ -26,6 +26,7 @@
                             </div>
                             @endif
 
+                            @if(isset($widgets['products-hl']) && isset($widgets['products-hl']->object) && count($widgets['products-hl']->object))
                             <div class="aside-category aside-product mt20">
                                 <div class="aside-heading">Sản phẩm nổi bật</div>
                                 <div class="aside-body">
@@ -46,6 +47,7 @@
                                     @endforeach
                                 </div>
                             </div>
+                            @endif
 
                         </div>
                     </div>

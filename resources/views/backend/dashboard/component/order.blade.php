@@ -17,6 +17,10 @@
             <tbody>
                 @if(isset($newOrders) && is_object($newOrders))
                     @foreach($newOrders as $order)
+                    @php
+                        $promotion = is_string($order->promotion) ? json_decode($order->promotion, true) : $order->promotion;
+                        $cart = is_string($order->cart) ? json_decode($order->cart, true) : $order->cart;
+                    @endphp
                     <tr>
                         <td class="text-right">
                             <a href="{{ route('order.detail', $order->id) }}">{{ $order->code }}</a>
@@ -28,10 +32,10 @@
                             {{ $order->fullname }}
                         </td>
                         <td class="text-right order-discount">
-                            {{ convert_price($order->promotion['discount'], true) }}
+                            {{ convert_price($promotion['discount'] ?? 0, true) }}
                         </td>
                         <td class="text-right order-total">
-                            {{ convert_price($order->cart['cartTotal'], true) }}
+                            {{ convert_price($cart['cartTotal'] ?? 0, true) }}
                         </td>
                     </tr>
                     @endforeach

@@ -94,7 +94,20 @@ class LanguageService implements LanguageServiceInterface
         }
     }
 
-    
+    public function updateStatus($post = []){
+        DB::beginTransaction();
+        try{
+            $payload[$post['field']] = (($post['value'] == 1)?2:1);
+            $language = $this->languageRepository->update($post['modelId'], $payload);
+            DB::commit();
+            return true;
+        }catch(\Exception $e ){
+            DB::rollBack();
+            // Log::error($e->getMessage());
+            echo $e->getMessage();die();
+            return false;
+        }
+    }
 
     public function switch($id){
         DB::beginTransaction();

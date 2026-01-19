@@ -80,16 +80,4 @@ class Product extends Model
         return $this->morphMany(Review::class, 'reviewable')->orderBy('created_at', 'DESC');
     }
 
-    public function constructions(){
-        return $this->belongsToMany(Construction::class, 'construction_product' , 'construction_id', 'product_id')->withPivot(
-            'construction_id',
-            'product_id',
-            'quantity',
-            'startDate',
-            'endDate',
-            'color',
-            'warranty',
-            'status',
-        );;
-    }
 }

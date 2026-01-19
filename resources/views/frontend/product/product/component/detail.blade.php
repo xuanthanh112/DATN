@@ -125,6 +125,7 @@
         <div class="uk-width-large-1-4 uk-visible-large">
             <div class="aside">
                
+                @if(isset($widgets['products-hl']) && isset($widgets['products-hl']->object) && count($widgets['products-hl']->object))
                 <div class="aside-category aside-product mt20">
                     <div class="aside-heading">Sản phẩm nổi bật</div>
                     <div class="aside-body">
@@ -145,6 +146,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
             </div>
         </div>
@@ -193,7 +195,7 @@
                     @foreach($cartSeen as $key => $val)
                     @php
                         $name = $val->name;
-                        $canonical = $val->options['canonical'];
+                        $canonical = write_url($val->options['canonical']);
                         $image = $val->options['image'];
                         $priceSeen = number_format($val->price, 0, ',', '.');
                     @endphp

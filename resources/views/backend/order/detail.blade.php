@@ -61,13 +61,17 @@
                                 </td>
                             </tr>
                             @endforeach
+                            @php
+                                $promotion = is_string($order->promotion) ? json_decode($order->promotion, true) : $order->promotion;
+                                $cart = is_string($order->cart) ? json_decode($order->cart, true) : $order->cart;
+                            @endphp
                             <tr>
                                 <td colspan="5" class="text-right">Tổng tạm</td>
-                                <td class="text-right">{{ convert_price($order->cart['cartTotal'], true) }} ₫</td>
+                                <td class="text-right">{{ convert_price($cart['cartTotal'] ?? 0, true) }} ₫</td>
                             </tr>
                             <tr>
                                 <td colspan="5" class="text-right">Giảm giá</td>
-                                <td class="text-right">- {{ convert_price($order->promotion['discount'], true) }} ₫</td>
+                                <td class="text-right">- {{ convert_price($promotion['discount'] ?? 0, true) }} ₫</td>
                             </tr>
                             <tr>
                                 <td colspan="5" class="text-right">Vận chuyển</td>
@@ -75,7 +79,7 @@
                             </tr>
                             <tr>
                                 <td colspan="5" class="text-right" ><strong>Tổng cuối</strong></td>
-                                <td class="text-right" style="font-size:18px;"><strong style="color:blue;">{{ convert_price($order->cart['cartTotal'] - $order->promotion['discount'], true) }} ₫</strong></td>
+                                <td class="text-right" style="font-size:18px;"><strong style="color:blue;">{{ convert_price(($cart['cartTotal'] ?? 0) - ($promotion['discount'] ?? 0), true) }} ₫</strong></td>
                             </tr>
                         </tbody>
                         
@@ -88,7 +92,7 @@
                             <div class="payment-title">
                                 <div class="text_1">
                                     <span class="isConfirm">{{ __('order.confirm')[$order->confirm] }}</span>
-                                    {{ convert_price($order->cart['cartTotal'] - $order->promotion['discount'], true) }}₫
+                                    {{ convert_price(($cart['cartTotal'] ?? 0) - ($promotion['discount'] ?? 0), true) }}₫
                                 </div>
                                 <div class="text_2">{{ array_column(__('payment.method'), 'title', 'name')[$order->method] ?? '-' }}</div>
                             </div>

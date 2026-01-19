@@ -307,7 +307,17 @@ if(!function_exists('write_url')){
         if(strpos($canonical, 'http') !== false){
             return $canonical;
         }
-        $fullUrl = (($fullDomain === true) ? config('app.url') : '').$canonical.( ($suffix === true) ? config('apps.general.suffix') : '' );
+        
+        $domain = '';
+        if ($fullDomain === true) {
+            $domain = rtrim(config('app.url'), '/');
+            // Đảm bảo có '/' giữa domain và canonical
+            if (!empty($canonical) && $canonical[0] !== '/') {
+                $canonical = '/' . $canonical;
+            }
+        }
+        
+        $fullUrl = $domain.$canonical.( ($suffix === true) ? config('apps.general.suffix') : '' );
         return $fullUrl;
     }
 }

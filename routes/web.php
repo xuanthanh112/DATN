@@ -50,8 +50,6 @@ use App\Http\Controllers\Frontend\CustomerController as FeCustomerController;
 use App\Http\Controllers\Frontend\DistributionController as FeDistributionController;
 use App\Http\Controllers\Frontend\ProductCatalogueController as FeProductCatalogueController;
 
-use App\Http\Controllers\Backend\Crm\ConstructionController;
-use App\Http\Controllers\Ajax\ConstructController as AjaxConstructController;
 use App\Http\Controllers\Ajax\CustomerController as AjaxCustomerController;
 
 
@@ -75,6 +73,12 @@ Route::get('crawler', [CrawlerController::class, 'index'])->name('crawler.ckfind
 Route::get('crawlerUpdate', [CrawlerController::class, 'crawlerUpdate'])->name('crawler.update');
 Route::get('crawlerProduct', [CrawlerController::class, 'crawlerProduct'])->name('crawler.product');
 Route::get('crawlerUpdateProduct', [CrawlerController::class, 'updateProduct'])->name('crawler.product.update');
+
+// Temporary route to clear cart seen
+Route::get('clear-cart-seen', function() {
+    Cart::instance('seen')->destroy();
+    return 'Cart seen cleared! Please go back to product page.';
+});
 
 
 Route::get('tim-kiem'.config('apps.general.suffix'), [FeProductCatalogueController::class, 'search'])->name('product.catalogue.search');
@@ -101,10 +105,6 @@ Route::group(['middleware' => ['customer']], function () {
    Route::get('customer/password/reset'.config('apps.general.suffix'), [FeCustomerController::class, 'passwordForgot'])->name('customer.password.change');
    Route::post('customer/password/recovery'.config('apps.general.suffix'), [FeCustomerController::class, 'recovery'])->name('customer.password.recovery');
    Route::get('customer/logout'.config('apps.general.suffix'), [FeCustomerController::class, 'logout'])->name('customer.logout');
-   // Route::get('customer/construction'.config('apps.general.suffix'), [FeCustomerController::class, 'construction'])->name('customer.construction');
-   // Route::get('customer/construction/{id}/product'.config('apps.general.suffix'), [FeCustomerController::class, 'constructionProduct'])->name('customer.construction.product')->where(['id' => '[0-9]+']);
-   Route::get('customer/warranty/check'.config('apps.general.suffix'), [FeCustomerController::class, 'warranty'])->name('customer.check.warranty');
-   Route::post('customer/warranty/active', [FeCustomerController::class, 'active'])->name('customer.active.warranty');
    
    // Customer Orders
    Route::get('customer/orders'.config('apps.general.suffix'), [FeCustomerController::class, 'orders'])->name('customer.orders');
@@ -418,8 +418,6 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
    Route::post('ajax/order/update', [AjaxOrderController::class, 'update'])->name('ajax.order.update');
    Route::get('ajax/order/chart', [AjaxOrderController::class, 'chart'])->name('ajax.order.chart');
 
-   Route::post('ajax/construct/createCustomer', [AjaxCustomerController::class,'createCustomer'])->name('ajax.construct.createCustomer');
-   Route::post('ajax/product/deleteProduct', [AjaxConstructController::class, 'deleteProduct'])->name('ajax.product.deleteProduct');
    Route::get('ajax/dashboard/findInformationObject', [AjaxDashboardController::class, 'findInformationObject'])->name('ajax.findInformationObject');
 });
 

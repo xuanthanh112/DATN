@@ -39,8 +39,6 @@ class RepositoryServiceProvider extends ServiceProvider
         'App\Repositories\Interfaces\OrderRepositoryInterface' => 'App\Repositories\OrderRepository',
         'App\Repositories\Interfaces\ReviewRepositoryInterface' => 'App\Repositories\ReviewRepository',
         'App\Repositories\Interfaces\DistributionRepositoryInterface' => 'App\Repositories\DistributionRepository',
-
-        'App\Repositories\Interfaces\ConstructRepositoryInterface' => 'App\Repositories\ConstructRepository',
         'App\Repositories\Interfaces\ProductWarrantyRepositoryInterface' => 'App\Repositories\ProductWarrantyRepository',
     ];
 
