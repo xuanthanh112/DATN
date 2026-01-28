@@ -54,8 +54,35 @@ class CartController extends FrontendController
         $provinces = $this->provinceRepository->all();
         $carts = Cart::instance('shopping')->content();
         $carts = $this->cartService->remakeCart($carts);
+        
+        // Tính tổng giá trị giỏ hàng GỐC (chưa áp dụng khuyến mại)
+        $originalTotal = 0;
+        foreach($carts as $cart){
+            $originalPrice = isset($cart->priceOriginal) ? $cart->priceOriginal : $cart->price;
+            $originalTotal += $originalPrice * $cart->qty;
+        }
+        
         $cartCaculate = $this->cartService->reCaculateCart();
-        $cartPromotion = $this->cartService->cartPromotion($cartCaculate['cartTotal']);
+        $productPromotions = $this->cartService->getAppliedProductPromotions();
+        $cartPromotion = $this->cartService->cartPromotion($originalTotal);
+        
+        // So sánh và chọn khuyến mại tốt hơn
+        $productDiscount = $productPromotions['discount'];
+        $orderDiscount = $cartPromotion['discount'];
+        
+        if($orderDiscount > $productDiscount){
+            // Áp dụng khuyến mại đơn hàng - cần hiển thị box order promotion
+            $cartCaculate['cartTotal'] = $originalTotal - $orderDiscount;
+            $cartCaculate['cartDiscount'] = $orderDiscount;
+            $cartCaculate['promotionType'] = 'order';
+            // Giữ nguyên $cartPromotion để hiển thị box
+            $productPromotions = ['promotions' => [], 'discount' => 0]; // Không hiển thị product box
+        } else {
+            // Áp dụng khuyến mại sản phẩm - giá đã được tính trong cartTotal
+            $cartCaculate['cartDiscount'] = $productDiscount;
+            $cartCaculate['promotionType'] = 'product';
+            $cartPromotion = ['selectedPromotion' => null, 'discount' => 0]; // Không hiển thị order box
+        }
 
         $seo = [
             'meta_title' => 'Trang thanh toán đơn hàng',
@@ -72,6 +99,7 @@ class CartController extends FrontendController
             'provinces',
             'carts',
             'cartPromotion',
+            'productPromotions',
             'cartCaculate',
         ));
         

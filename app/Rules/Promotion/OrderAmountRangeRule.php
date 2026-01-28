@@ -34,8 +34,11 @@ class OrderAmountRangeRule implements ValidationRule
             $fail('Bạn phải khởi tạo giá trị cho khoảng khuyến mại');
         }
 
-        if(in_array(0, $this->data['amountValue']) || in_array('', $this->data['amountValue'])){
-            $fail('Cấu hình giá trị khuyến mãi không hợp lệ');
+        // Kiểm tra $this->data['amountValue'] có tồn tại và là array trước khi dùng in_array
+        if(isset($this->data['amountValue']) && is_array($this->data['amountValue'])){
+            if(in_array(0, $this->data['amountValue']) || in_array('', $this->data['amountValue'])){
+                $fail('Cấu hình giá trị khuyến mãi không hợp lệ');
+            }
         }
 
         $conflict = false;

@@ -26,7 +26,7 @@ class UpdatePromotionRequest extends FormRequest
 
         $rules = [
             'name' => 'required',
-            'code' => 'required|unique:promotions,id, '.$this->id.'',
+            'code' => 'nullable|unique:promotions,id, '.$this->id.'',
             'startDate' => 'required|custom_date_format',
         ];
         $date = $this->only('startDate', 'endDate');

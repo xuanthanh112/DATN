@@ -94,8 +94,11 @@ class OrderService extends BaseService implements OrderServiceInterface
                 $variant = $this->productVariantRepository->findByCondition([
                     ['uuid', '=', $uuid]
                 ]);
-                $variantImage = explode(',' , $variant->album)[0] ?? null;
-                $val->image = $variantImage;
+                // Kiểm tra $variant có tồn tại và có album không
+                if($variant && $variant->album){
+                    $variantImage = explode(',' , $variant->album)[0] ?? null;
+                    $val->image = $variantImage;
+                }
             }
         }
 

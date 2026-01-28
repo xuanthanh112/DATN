@@ -148,6 +148,7 @@
                HT.changeMinyQuantityItem(_this, option)
                HT.changeCartItemSubTotal(_this, res)
                HT.changeCartTotal(res)
+               HT.updatePromotionBox(res)
                toastr.success(res.messages, 'Thông báo từ hệ thống!')
             }else{
                toastr.error('Có vấn đề xảy ra! Hãy thử lại', 'Thông báo từ hệ thống!')
@@ -174,6 +175,68 @@
       $('.discount-value').html('-' + addCommas(res.response.cartDiscount) + 'đ')
    }
 
+   HT.updatePromotionBox = (res) => {
+      if(!res.promotion) return;
+      
+      let productDiscount = res.promotion.productDiscount || 0;
+      let orderDiscount = res.promotion.orderDiscount || 0;
+      let orderPromotion = res.promotion.orderPromotion;
+      let productPromotions = res.promotion.productPromotions || [];
+      
+      // Tìm hoặc tạo box khuyến mại
+      let $promotionBox = $('.promotion-info-box');
+      
+      // Xóa tất cả box cũ trước
+      $promotionBox.remove();
+      
+      // Tạo box mới dựa trên loại khuyến mại tốt hơn
+      let boxHtml = '';
+      
+      if(orderDiscount > productDiscount && orderPromotion){
+         // Box khuyến mại đơn hàng
+         boxHtml = `
+            <div class="promotion-info-box">
+               <div class="promotion-icon">
+                  <i class="fa fa-gift"></i>
+               </div>
+               <div class="promotion-content">
+                  <div class="promotion-title">Đang áp dụng khuyến mại theo đơn hàng</div>
+                  <div class="promotion-name">${orderPromotion.name || 'Khuyến mại'}</div>
+                  <div class="promotion-discount">Giảm: <span class="discount-amount">-${addCommas(orderDiscount)}đ</span></div>
+               </div>
+            </div>
+         `;
+      } else if(productDiscount > 0){
+         // Box khuyến mại sản phẩm
+         let promotionNames = '';
+         if(productPromotions.length > 0){
+            // Chỉ hiển thị promotion đầu tiên
+            let firstPromo = productPromotions[0];
+            promotionNames = `<div class="promotion-name">${firstPromo.name || 'Khuyến mại sản phẩm'}</div>`;
+         } else {
+            promotionNames = '<div class="promotion-name">Đang áp dụng khuyến mại</div>';
+         }
+         
+         boxHtml = `
+            <div class="promotion-info-box">
+               <div class="promotion-icon">
+                  <i class="fa fa-gift"></i>
+               </div>
+               <div class="promotion-content">
+                  <div class="promotion-title">Đang áp dụng khuyến mại theo sản phẩm</div>
+                  ${promotionNames}
+                  <div class="promotion-discount">Giảm: <span class="discount-amount">-${addCommas(productDiscount)}đ</span></div>
+               </div>
+            </div>
+         `;
+      }
+      
+      // Chèn box mới vào trước dòng "Giảm giá"
+      if(boxHtml){
+         $('.cart-summary-item').first().before(boxHtml);
+      }
+   }
+
    HT.removeCartItem = () => {
       $(document).on('click', '.cart-item-remove', function(){
          let _this = $(this)
@@ -194,6 +257,7 @@
                if(res.code === 10){
                   HT.changeMinyCartQuantity(res)
                   HT.changeCartTotal(res)
+                  HT.updatePromotionBox(res)
                   HT.removeCartItemRow(_this)
                   toastr.success(res.messages, 'Thông báo từ hệ thống!')
                }else{

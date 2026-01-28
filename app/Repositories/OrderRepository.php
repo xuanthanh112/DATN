@@ -294,7 +294,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
                 DB::raw("COUNT(DISTINCT orders.customer_id) as count_customer"),
                 DB::raw("SUM(order_product.qty) as count_order"),
                 DB::raw("SUM(order_product.price * order_product.qty) as sum_revenue"),
-                DB::raw("(SELECT SUM(JSON_UNQUOTE(JSON_EXTRACT(promotion, '$.discount'))) FROM orders WHERE DATE(created_at) = DATE(orders.created_at)) as sum_discount")
+                DB::raw("0 as sum_discount")
             )
             ->join('order_product', 'order_product.order_id', '=', 'orders.id')
             ->leftJoin('products', 'products.id', '=', 'order_product.product_id')

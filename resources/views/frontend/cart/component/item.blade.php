@@ -26,9 +26,9 @@
                                 </div>
                                 <div class="cart-item-price">
                                     <div class="uk-flex uk-flex-bottom">
-                                        {{-- @if($cart->price  != $cart->priceOriginal)
-                                        <span class="cart-price-old mr10">{{ convert_price($cart->priceOriginal, true) }}đ</span>
-                                        @endif --}}
+                                        @if($cart->price  != $cart->priceOriginal)
+                                        <span class="cart-price-old mr10">{{ convert_price($cart->priceOriginal * $cart->qty, true) }}đ</span>
+                                        @endif
                                         <span class="cart-price-sale">{{ convert_price($cart->price * $cart->qty, true) }}đ</span>
                                     </div>
                                 </div>

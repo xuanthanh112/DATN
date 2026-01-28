@@ -26,7 +26,7 @@ class StorePromotionRequest extends FormRequest
 
         $rules = [
             'name' => 'required',
-            'code' => 'required|unique:promotions',
+            'code' => 'nullable|unique:promotions',
             'startDate' => 'required|custom_date_format',
         ];
         $date = $this->only('startDate', 'endDate');

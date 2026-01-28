@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\OrderRepositoryInterface as OrderRepository;
 use App\Repositories\Interfaces\ProductVariantRepositoryInterface  as ProductVariantRepository;
 use Cart;
 use App\Mail\OrderMail;
+use App\Models\Promotion;
 
 /**
  * Class AttributeCatalogueService
@@ -227,10 +228,36 @@ class CartService  implements CartServiceInterface
     }
 
     private function cartAndPromotion(){
+        // Tính cart total với product promotion (đã được áp dụng trong reCaculateCart)
         $cartCaculate = $this->reCaculateCart();
-        $cartPromotion = $this->cartPromotion($cartCaculate['cartTotal']);
-        $cartCaculate['cartTotal'] = $cartCaculate['cartTotal'] - $cartPromotion['discount'];
-        $cartCaculate['cartDiscount'] = $cartPromotion['discount'];
+        
+        // Tính tổng giá trị giỏ hàng GỐC (chưa áp dụng bất kỳ khuyến mại nào)
+        $carts = Cart::instance('shopping')->content();
+        $originalTotal = 0;
+        foreach($carts as $cart){
+            $originalPrice = isset($cart->priceOriginal) ? $cart->priceOriginal : $cart->price;
+            $originalTotal += $originalPrice * $cart->qty;
+        }
+        
+        // Lấy thông tin 2 loại khuyến mại
+        $productPromotions = $this->getAppliedProductPromotions();
+        $productDiscount = $productPromotions['discount'];
+        
+        // Tính khuyến mại đơn hàng dựa trên tổng GỐC
+        $orderPromotion = $this->cartPromotion($originalTotal);
+        $orderDiscount = $orderPromotion['discount'];
+        
+        // SO SÁNH và chọn loại khuyến mại TỐT HƠN
+        if($orderDiscount > $productDiscount){
+            // Áp dụng khuyến mại đơn hàng
+            $cartCaculate['cartTotal'] = $originalTotal - $orderDiscount;
+            $cartCaculate['cartDiscount'] = $orderDiscount;
+            $cartCaculate['promotionType'] = 'order';
+        } else {
+            // Áp dụng khuyến mại sản phẩm (đã tính sẵn trong cartTotal)
+            $cartCaculate['cartDiscount'] = $productDiscount;
+            $cartCaculate['promotionType'] = 'product';
+        }
 
         return $cartCaculate;
     }
@@ -252,6 +279,7 @@ class CartService  implements CartServiceInterface
         
         // Lấy khuyến mại theo sản phẩm
         $productPromotions = [];
+        $appliedPromotionIds = []; // Lưu IDs các promotion đã apply
         if(count($productIds) > 0){
             $promotions = $this->promotionRepository->findByProduct($productIds);
             foreach($promotions as $promotion){
@@ -279,13 +307,24 @@ class CartService  implements CartServiceInterface
                    isset($promotion->discountInformation['info']) &&
                    isset($promotion->discountInformation['info']['quantity'])){
                     
-                    $minQuantity = (int)($promotion->discountInformation['info']['quantity'][0] ?? 0);
-                    $maxQuantity = isset($promotion->discountInformation['info']['maxQuantity'][0]) 
-                        ? (int)$promotion->discountInformation['info']['maxQuantity'][0] 
-                        : null;
+                    // Lấy quantity - có thể là giá trị đơn hoặc mảng
+                    $quantityValue = $promotion->discountInformation['info']['quantity'];
+                    $minQuantity = is_array($quantityValue) ? (int)($quantityValue[0] ?? 0) : (int)$quantityValue;
+                    
+                    // Lấy maxQuantity - sử dụng convert_price để parse chuỗi có định dạng
+                    $maxQuantityValue = $promotion->discountInformation['info']['maxQuantity'] ?? null;
+                    if($maxQuantityValue){
+                        if(is_array($maxQuantityValue)){
+                            $maxQuantity = convert_price($maxQuantityValue[0]);
+                        } else {
+                            $maxQuantity = convert_price($maxQuantityValue);
+                        }
+                    } else {
+                        $maxQuantity = null;
+                    }
                     
                     // Nếu maxQuantity là 0 hoặc null thì không giới hạn
-                    if($maxQuantity === 0){
+                    if($maxQuantity === 0 || $maxQuantity === null){
                         $maxQuantity = null;
                     }
                     
@@ -309,6 +348,11 @@ class CartService  implements CartServiceInterface
                             
                             $finalPrice = $originalPrice - $discount;
                             if($finalPrice < 0) $finalPrice = 0;
+                            
+                            // Lưu lại promotion ID đã áp dụng
+                            if(!in_array($promotion->promotion_id, $appliedPromotionIds)){
+                                $appliedPromotionIds[] = $promotion->promotion_id;
+                            }
                         }
                     }
                 }
@@ -323,7 +367,8 @@ class CartService  implements CartServiceInterface
         
         return [
             'cartTotal' => $total,
-            'cartTotalItems' => $totalItems
+            'cartTotalItems' => $totalItems,
+            'appliedPromotionIds' => $appliedPromotionIds
         ];
     }
 
@@ -463,6 +508,43 @@ class CartService  implements CartServiceInterface
         return [
             'discount' => $maxDiscount,
             'selectedPromotion' => $selectedPromotion
+        ];
+    }
+
+    public function getAppliedProductPromotions(){
+        $carts = Cart::instance('shopping')->content();
+        $appliedPromotions = [];
+        $totalDiscount = 0;
+        
+        // Gọi reCaculateCart() để lấy danh sách promotion IDs THỰC SỰ được áp dụng
+        $cartInfo = $this->reCaculateCart();
+        $appliedPromotionIds = $cartInfo['appliedPromotionIds'] ?? [];
+        
+        // Tính tổng số tiền đã giảm
+        foreach($carts as $cart){
+            $originalPrice = $cart->priceOriginal ?? $cart->price;
+            $discountedPrice = $cart->price;
+            $quantity = $cart->qty;
+            
+            // Tính tiền giảm = (giá gốc - giá sau giảm) × số lượng
+            $discount = ($originalPrice - $discountedPrice) * $quantity;
+            if($discount > 0){
+                $totalDiscount += $discount;
+            }
+        }
+        
+        // Lấy thông tin đầy đủ của các promotions đã được áp dụng
+        if(count($appliedPromotionIds) > 0){
+            $promotions = Promotion::whereIn('id', $appliedPromotionIds)->get();
+            
+            foreach($promotions as $promotion){
+                $appliedPromotions[$promotion->id] = $promotion;
+            }
+        }
+        
+        return [
+            'promotions' => array_values($appliedPromotions),
+            'discount' => $totalDiscount
         ];
     }
    

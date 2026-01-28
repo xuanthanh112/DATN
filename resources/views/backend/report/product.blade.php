@@ -65,14 +65,12 @@
                             <th class="text-right">Tên SP</th>
                             <th class="text-right">SL khách</th>
                             <th class="text-right">SL hàng bán</th>
-                            <th class="text-right">Tiền hàng(vnđ)</th>
-                            <th class="text-right">Tổng chiết khấu(vnđ)</th>
                             <th class="text-right">Doanh thu(vnđ)</th>
                     </thead>
                     <tbody>
                         @if(count($reports))
                         @php
-                            $td = ['sku', 'product_name', 'count_customer','count_order','sum_revenue|format', 'sum_discount|format'];
+                            $td = ['sku', 'product_name', 'count_customer','count_order','sum_revenue|format'];
                         @endphp
                         @foreach($reports as $key => $val)
                             <tr class="table">
@@ -85,7 +83,6 @@
                                         {{ $value }}
                                     </td>
                                 @endforeach
-                                <td class="text-right">{{ convert_price($val['sum_revenue'] - $val['sum_discount'], true) }}</td>
                             </tr>
                         @endforeach
                     @endif

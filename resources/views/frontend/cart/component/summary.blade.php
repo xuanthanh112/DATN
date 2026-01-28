@@ -6,16 +6,31 @@
                 <i class="fa fa-gift"></i>
             </div>
             <div class="promotion-content">
-                <div class="promotion-title">Đang áp dụng khuyến mại</div>
+                <div class="promotion-title">Đang áp dụng khuyến mại theo đơn hàng</div>
                 <div class="promotion-name">{{ $cartPromotion['selectedPromotion']->name }}</div>
                 <div class="promotion-discount">Giảm: <span class="discount-amount">-{{ convert_price($cartPromotion['discount'], true) }}đ</span></div>
+            </div>
+        </div>
+        @endif
+        
+        @if(isset($productPromotions['promotions']) && count($productPromotions['promotions']) > 0)
+        <div class="promotion-info-box">
+            <div class="promotion-icon">
+                <i class="fa fa-gift"></i>
+            </div>
+            <div class="promotion-content">
+                <div class="promotion-title">Đang áp dụng khuyến mại theo sản phẩm</div>
+                @foreach($productPromotions['promotions'] as $promo)
+                <div class="promotion-name">{{ $promo->name }}</div>
+                @endforeach
+                <div class="promotion-discount">Giảm: <span class="discount-amount">-{{ convert_price($productPromotions['discount'], true) }}đ</span></div>
             </div>
         </div>
         @endif
         <div class="cart-summary-item">
             <div class="uk-flex uk-flex-middle uk-flex-space-between">
                 <span class="summay-title">Giảm giá</span>
-                <div class="summary-value discount-value">-{{ convert_price($cartPromotion['discount'], true) }}đ</div>
+                <div class="summary-value discount-value">-{{ convert_price(($productPromotions['discount'] ?? 0) + $cartPromotion['discount'], true) }}đ</div>
             </div>
         </div>
         <div class="cart-summary-item">

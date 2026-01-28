@@ -55,11 +55,25 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
             "
         )
         ->join('promotion_product_variant as ppv', 'ppv.promotion_id', '=', 'promotions.id')
-        ->join('products', 'products.id', '=', 'ppv.product_id')
+        ->join('products', function($join) {
+            $join->on(\DB::raw('1'), '=', \DB::raw('1'))
+                ->where(function($query) {
+                    $query->where(function($q) {
+                        // Case 1: model = Product, join exact product_id
+                        $q->where('ppv.model', '=', 'Product')
+                          ->whereRaw('products.id = ppv.product_id');
+                    })
+                    ->orWhere(function($q) {
+                        // Case 2: model = ProductCatalogue, join by catalogue
+                        $q->where('ppv.model', '=', 'ProductCatalogue')
+                          ->whereRaw('products.product_catalogue_id = ppv.product_id');
+                    });
+                });
+        })
         ->where('products.publish', 2)
         ->where('promotions.publish', 2)
         ->where('promotions.method', 'product_and_quantity')
-        ->whereIn('ppv.product_id', $productId)
+        ->whereIn('products.id', $productId)
         ->whereDate('promotions.startDate', '<=', now());
         
         // Xử lý neverEndDate: nếu có thì không check endDate
@@ -68,7 +82,7 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
               ->orWhereDate('promotions.endDate', '>=', now());
         });
         
-        return $query->groupBy('ppv.product_id', 'promotions.id')
+        return $query->groupBy('products.id', 'promotions.id')
         ->get();
     }
 
